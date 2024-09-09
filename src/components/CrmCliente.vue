@@ -255,16 +255,6 @@
               {{ mensaje_error }}
             </div>
           </div>
-          <!-- <div class="col mb-3" v-if="$route.params.id != undefined">
-                        <label class="form-label">Cierra PQRSF:
-                        </label>
-                        <input type="text" class="form-control" autocomplete="off" id="exampleInputEmail1"
-                            aria-describedby="emailHelp" v-model="cierra_pqrsf" required
-                            :disabled="$route.params.id != undefined" />
-                        <div class="invalid-feedback">
-                            {{ mensaje_error }}
-                        </div>
-                    </div> -->
         </div>
         <div class="row">
           <div class="col mb-3">
@@ -438,13 +428,13 @@
                         alt=""
                       />
                     </div>
-                    <div class="col-md-8">
+                    <!-- <div class="col-md-8">
                       <div class="card-body" style="text-align: left"></div>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
-              <div class="row editor"></div>
+              <!-- <div class="row editor"></div> -->
               <div
                 class="row trash justify-content-center align-items-center padding-1"
               >
