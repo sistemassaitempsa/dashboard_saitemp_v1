@@ -379,6 +379,7 @@
                           accept="image/*,.pdf, .msg"
                           @change="cargarArchivo($event, index)"
                           id="formFileMultiple"
+                          :ref="'fileInput' + index"
                           required
                         />
                         <span
@@ -397,7 +398,7 @@
                         id="novedades"
                         class="form-control textareaControl"
                         rows="1"
-                        v-model="item.observacion"
+                        v-model="evidencias[index].observacion"
                       ></textarea>
                     </div>
                     <div class="col-2 rightContent">
@@ -670,15 +671,16 @@ export default {
     },
 
     agregarObservacion() {
-      this.verLista = this.verLista + 1;
       if (this.evidencias.length <= 10) {
-        this.evidencias.push({ body: "", file: [] });
+        this.evidencias.push({ observacion: "", file: [] });
       }
     },
     deleteDynamic(array, index, identificador = null) {
       if (identificador != null) {
         this.consulta_texto.splice(index, 1);
         this.evidencias[index].file = [];
+        this.evidencias.splice(index, 0);
+        console.log(this.evidencias);
       }
       array.splice(index, 1);
     },
@@ -778,6 +780,7 @@ export default {
     },
     quitarAdjuntos(index) {
       this.evidencias[index].file = [];
+      this.$refs["fileInput" + index][0].value = null;
     },
     formatearPesoArchivo(pesoBytes) {
       if (pesoBytes < 1024) {
