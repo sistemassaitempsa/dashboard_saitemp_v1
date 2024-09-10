@@ -388,14 +388,14 @@ export default {
           item.ruta_archivo + "*" + item.nombre_archivo
         );
       });
-      /* 222 */
       axios
         .post(self.URL_API + "api/v1/enviocorreo", correo, config)
         .then(function (result) {
           self.loading = false;
           self.$emit("lanzarLoading", false);
-          self.showAlert(result.data.message, result.data.status);
           self.$emit("correoEnviado");
+          self.showAlert(result.data.message, result.data.status);
+
         });
     },
     cargarArchivo(event) {

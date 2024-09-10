@@ -35,7 +35,7 @@ export default {
             tabla: [
                 { nombre: "#", orden: "DESC" },
                 { nombre: "Radicado", orden: "DESC", tipo: "texto", calculado: 'false' },
-                { nombre: "N° de servicio", orden: "DESC", tipo: "texto", calculado: 'false' },
+                { nombre: "Número servicio", orden: "DESC", tipo: "texto", calculado: 'false' },
                 { nombre: "Fecha radicado", orden: "DESC", tipo: "fecha", calculado: 'false' },
                 { nombre: "Número identificación", orden: "DESC", tipo: "texto", calculado: 'false' },
                 { nombre: "Nombre candidato", orden: "DESC", tipo: "texto", calculado: 'false' },
@@ -50,7 +50,6 @@ export default {
                 { nombre: "Observaciones al servicio", orden: "DESC", tipo: "texto", calculado: 'false' },
                 { nombre: "Novedad en servicio", orden: "DESC", tipo: "texto", calculado: 'false' },
                 { nombre: "Profesional", orden: "DESC", tipo: "texto", calculado: 'false' },
-                // { nombre: "Citación entrevista", orden: "DESC", tipo: "texto", calculado: 'false' },
                 { nombre: "Tipo servicio", orden: "DESC", tipo: "texto", calculado: 'false' },
                 { nombre: "Afectaciones al servicio", orden: "DESC", tipo: "texto", calculado: 'false' },
                 { nombre: "Corregir por", orden: "DESC", tipo: "texto", calculado: 'false' },
