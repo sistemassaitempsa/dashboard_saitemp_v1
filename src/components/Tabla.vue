@@ -1003,6 +1003,44 @@
                 </ul>
               </div>
             </td>
+            <td v-if="ruta == '/navbar/debida-diligencia/clientes'">
+              <div class="btn-group">
+                <button
+                  type="button"
+                  class="btn"
+                  :style="'color:black;background-color:' + item.color_estado"
+                >
+                  {{ truncateOwner(item.responsable, maxCaracteres) }}
+                </button>
+                <button
+                  type="button"
+                  class="btn dropdown-toggle dropdown-toggle-split"
+                  v-if="permisos[20].autorizado"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  :style="'color:black;background-color:' + item.color_estado"
+                  @click="
+                    getEncargados(item.estado_ingreso_id),
+                      (lista_encargados = [])
+                  "
+                >
+                  <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li
+                    style="cursor: pointer"
+                    v-for="(item2, index) in lista_encargados"
+                    :key="index"
+                  >
+                    <a
+                      class="dropdown-item"
+                      @click="actualizaResponsable(item.id, index)"
+                      >{{ item2.nombre }}</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </td>
             <td v-if="ruta == '/navbar/gestion-ingresosl'">
               <!-- <div style="position: absolute;">{{item.estado_ingreso}}</div> -->
               <div class="btn-group">
@@ -1240,6 +1278,7 @@ export default {
   },
   data() {
     return {
+      lista_encargados_debida_diligencia: [],
       URL_API: process.env.VUE_APP_URL_API,
       sorted: false,
       tabla2: [],
@@ -1429,6 +1468,15 @@ export default {
         display: this.shouldDisplayColumn(item) ? "table-cell" : "none",
         ...this.getDynamicStyle(item, index),
       };
+    },
+    getEncargadosDebidaDiligencia(id) {
+      let self = this;
+      let config = this.configHeader();
+      axios
+        .get(self.URL_API + "api/v1/estadoResponsableFirma/" + id, config)
+        .then(function (result) {
+          self.lista_encargados_debida_diligencia = result.data;
+        });
     },
     getEncargados(id) {
       let self = this;

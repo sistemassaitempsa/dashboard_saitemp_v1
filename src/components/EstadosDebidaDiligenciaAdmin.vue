@@ -296,8 +296,8 @@ export default {
       axios
         .delete(self.URL_API + "api/v1/estadosfirma/" + id, config)
         .then(function (result) {
-          this.loading = false;
           self.showAlert(result.data.message, result.data.status);
+          console.log(result);
         });
     },
     getEstados(item = null) {
@@ -309,7 +309,7 @@ export default {
         this.tiempo_respuesta = item.tiempo_respuesta;
         this.tiempo_respuesta_cambio = item.tiempo_respuesta;
         this.disabled = false;
-        this.getResponsablesEstado(item.id).then(() => {});
+        this.getResponsablesEstado(item.id);
       }
       let self = this;
       let config = this.configHeader();
