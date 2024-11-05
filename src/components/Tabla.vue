@@ -1008,7 +1008,9 @@
                 <button
                   type="button"
                   class="btn"
-                  :style="'color:black;background-color:' + item.color_estado"
+                  :style="
+                    'color:black;background-color:' + item.color_estado_firma
+                  "
                 >
                   {{ truncateOwner(item.responsable, maxCaracteres) }}
                 </button>
@@ -1018,10 +1020,12 @@
                   v-if="permisos[20].autorizado"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
-                  :style="'color:black;background-color:' + item.color_estado"
+                  :style="
+                    'color:black;background-color:' + item.color_estado_firma
+                  "
                   @click="
-                    getEncargados(item.estado_ingreso_id),
-                      (lista_encargados = [])
+                    getEncargadosDebidaDiligencia(item.estado_firma_id),
+                      (lista_encargados_debida_diligencia = [])
                   "
                 >
                   <span class="visually-hidden">Toggle Dropdown</span>
@@ -1029,12 +1033,12 @@
                 <ul class="dropdown-menu">
                   <li
                     style="cursor: pointer"
-                    v-for="(item2, index) in lista_encargados"
+                    v-for="(item2, index) in lista_encargados_debida_diligencia"
                     :key="index"
                   >
                     <a
                       class="dropdown-item"
-                      @click="actualizaResponsable(item.id, index)"
+                      @click="actualizaResponsableDD(item.id, index)"
                       >{{ item2.nombre }}</a
                     >
                   </li>
@@ -1510,6 +1514,18 @@ export default {
       // }
       // return this.lista_estados_id[id];
       // return 'Estado'
+    },
+    actualizaResponsableDD(item_id, index) {
+      this.$emit(
+        "actualizaResponsableDD",
+        item_id,
+        this.lista_encargados_debida_diligencia[index].usuario_id,
+        this.lista_encargados_debida_diligencia[index].nombre,
+        this.currentUrl
+      );
+      setTimeout(() => {
+        this.lista_encargados_debida_diligencia = [];
+      }, 1000);
     },
     actualizaResponsable(item_id, index) {
       this.$emit(

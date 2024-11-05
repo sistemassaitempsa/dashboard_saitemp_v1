@@ -29,6 +29,32 @@
           Radicado: {{ numero_radicado }}
         </p>
         <div class="row">
+          <div class="col">
+            <SearchList
+              nombreCampo="Estado: *"
+              @getEstadosIngreso="getEstadosIngreso"
+              eventoCampo="getEstadosIngreso"
+              nombreItem="nombre"
+              :consulta="consulta_estado_firma"
+              :registros="estados_firma_debida_diligencia"
+              placeholder="Seleccione una opción"
+            />
+          </div>
+          <div class="col">
+            <SearchList
+              nombreCampo="Responsable: "
+              @getEncargados="getEncargados"
+              eventoCampo="getEncargados"
+              nombreItem="nombre"
+              :consulta="consulta_responsable_firma"
+              :registros="lista_responsables"
+              placeholder="Seleccione una opción"
+              :valida_campo="replica > 1"
+            />
+          </div>
+          <div class="col"></div>
+        </div>
+        <div class="row">
           <div class="col-4">
             <SearchList
               nombreCampo="Tipo de cliente: *"
@@ -3590,6 +3616,14 @@ export default {
   },
   data() {
     return {
+      consulta_responsable_firma: "",
+      estado_firma_id: "",
+      consulta_estado_firma: "",
+      consulta_responsable: "",
+      responsable_id: "",
+      lista_responsables: [],
+      lista_responsables_corregir: [],
+      estados_firma_debida_diligencia: [],
       URL_API: process.env.VUE_APP_URL_API,
       proveedor: false,
       cliente: false,
@@ -6617,6 +6651,41 @@ export default {
           });
           return archivo;
         });
+    },
+    getEstadosIngreso(item = null) {
+      if (item != null) {
+        this.consulta_responsable_firma = "";
+        this.estado_firma_id = item.id;
+        this.consulta_estado_firma = item.nombre;
+        this.consulta_responsable = "";
+        this.responsable_id = "";
+        this.lista_responsables = [];
+        this.lista_responsables_corregir = [];
+        this.getEncargados(null, item.id);
+      }
+      let self = this;
+      let config = this.configHeader();
+      axios
+        .get(self.URL_API + "api/v1/estadosfirma", config)
+        .then(function (result) {
+          self.estados_firma_debida_diligencia = result.data;
+        });
+    },
+    getEncargados(item = null, id = null) {
+      if (item != null) {
+        this.responsable_id = item.usuario_id;
+        this.consulta_encargado = item.nombre;
+        this.consulta_responsable_firma = item.nombre;
+      }
+      if (id != null) {
+        let self = this;
+        let config = this.configHeader();
+        axios
+          .get(self.URL_API + "api/v1/estadoResponsableFirma/" + id, config)
+          .then(function (result) {
+            self.lista_responsables = result.data;
+          });
+      }
     },
     llenarFormularioGuardado(item = null) {
       var self = this;
