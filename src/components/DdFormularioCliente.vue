@@ -52,7 +52,6 @@
               :valida_campo="replica > 1"
             />
           </div>
-          <div class="col"></div>
         </div>
         <div class="row">
           <div class="col-4">
@@ -6499,6 +6498,9 @@ export default {
     },
     crearCliente() {
       this.registroCliente = {
+        estado_firma_id: this.estado_firma_id,
+        responsable: this.consulta_responsable_firma,
+        responsable_id: this.responsable_id,
         operacion: this.operacion,
         tipo_persona: this.tipo_persona,
         digito_verificacion: this.digito_verificacion,
@@ -6998,6 +7000,11 @@ export default {
             }
           });
         });
+        this.getEncargados(null, item.estado_firma_id);
+        this.responsable_id = item.responsable_id;
+        this.estado_firma_id = item.estado_firma_id;
+        this.consulta_responsable_firma = item.responsable;
+        this.consulta_estado_firma = item.nombre_estado_firma;
         this.getActividadesCiiu(item.codigo_ciiu_id);
         this.operacion = item.operacion_id;
         this.consulta_operacion = item.tipo_operacion;
