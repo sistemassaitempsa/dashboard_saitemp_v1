@@ -22,6 +22,63 @@
         </div>
       </div>
     </div>
+    <div
+      @click="toggleDiv"
+      :class="{
+        expandido: divExpandido,
+        pestaña: !divExpandido,
+        pestaña3: divExpandido,
+      }"
+      class="pestaña"
+      style="overflow-y: auto"
+      v-if="seguimiento.length > 0"
+    >
+      <div v-if="!divExpandido">Seguimiento guardado</div>
+      <div v-for="(item, index) in seguimiento" :key="index">
+        <div v-if="divExpandido" style="text-align: left">
+          {{ item.estado }}
+        </div>
+        <div v-if="divExpandido" style="text-align: left">
+          {{ item.usuario }}
+        </div>
+        <div v-if="divExpandido" style="text-align: left">
+          {{ reformatearFecha(item.created_at) }}
+        </div>
+        <hr v-if="divExpandido" />
+      </div>
+    </div>
+    <div
+      @click="toggleDiv2"
+      :class="{
+        expandido2: divExpandido2,
+        pestaña: !divExpandido2,
+        pestaña2: divExpandido2,
+      }"
+      class="pestaña2"
+      style="overflow-y: auto"
+      v-if="seguimiento_estados.length > 0"
+    >
+      <div v-if="!divExpandido2">Seguimiento estados</div>
+      <div v-for="(item, index) in seguimiento_estados" :key="index">
+        <div v-if="divExpandido2" style="text-align: left">
+          {{ item.estados_firma_final }}
+        </div>
+        <div v-if="divExpandido2" style="text-align: left">
+          {{ item.responsable_final.replace("null", "") }}
+        </div>
+        <div v-if="divExpandido2" style="text-align: left; margin: 5px">
+          <i style="font-size: 1.5rem" class="bi bi-arrow-up-circle"></i> Fecha:
+          {{ reformatearFecha(item.created_at) }}
+        </div>
+        <div v-if="divExpandido2" style="text-align: left">
+          {{ item.estados_firma_inicial }}
+        </div>
+        <div v-if="divExpandido2" style="text-align: left">
+          {{ item.responsable_inicial.replace("null", "") }}
+        </div>
+        <hr v-if="divExpandido2" />
+      </div>
+    </div>
     <form class="was-validated" @submit.prevent="save()">
       <h6 class="tituloseccion">Información general</h6>
       <div id="seccion">
@@ -3615,6 +3672,10 @@ export default {
   },
   data() {
     return {
+      seguimiento: [],
+      seguimiento_estados: [],
+      divExpandido: false,
+      divExpandido2: false,
       consulta_responsable_firma: "",
       estado_firma_id: "",
       consulta_estado_firma: "",
@@ -6681,6 +6742,18 @@ export default {
           self.estados_firma_debida_diligencia = result.data;
         });
     },
+    reformatearFecha(fechaOriginal) {
+      const fechaHora = new Date(fechaOriginal);
+      const año = fechaHora.getFullYear();
+      const mes = (fechaHora.getMonth() + 1).toString().padStart(2, "0"); // Los meses son indexados desde 0
+      const dia = fechaHora.getDate().toString().padStart(2, "0");
+      const horas = fechaHora.getHours().toString().padStart(2, "0");
+      const minutos = fechaHora.getMinutes().toString().padStart(2, "0");
+      const segundos = fechaHora.getSeconds().toString().padStart(2, "0");
+      const fechaFormateada = `${dia}/${mes}/${año}  `;
+      const horaFormateada = `${horas}:${minutos}:${segundos}`;
+      return fechaFormateada + " " + horaFormateada;
+    },
     getEncargados(item = null, id = null) {
       if (item != null) {
         this.responsable_id = item.usuario_id;
@@ -7008,6 +7081,8 @@ export default {
             }
           });
         });
+        this.seguimiento = item.seguimiento;
+        this.seguimiento_estados = item.seguimiento_estados;
         this.getEncargados(null, item.estado_firma_id);
         this.responsable_id = item.responsable_id;
         this.estado_firma_id = item.estado_firma_id;
@@ -7401,6 +7476,14 @@ export default {
         console.log(error);
       }
     },
+    toggleDiv() {
+      this.divExpandido = !this.divExpandido;
+      this.divExpandido2 = false;
+    },
+    toggleDiv2() {
+      this.divExpandido2 = !this.divExpandido2;
+      this.divExpandido = false;
+    },
   },
 };
 </script>
@@ -7602,6 +7685,145 @@ ul li {
   margin: 0px;
   margin-top: 5px;
   color: rgba(0, 0, 0, 0.377);
+}
+.pestaña {
+  position: fixed;
+  top: 30%;
+  right: 0;
+  background-color: lightblue;
+  padding: 10px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  cursor: pointer;
+  z-index: 1000;
+  background: rgb(0, 107, 63);
+  color: white;
+  background: linear-gradient(
+    95deg,
+    rgba(0, 107, 63, 1) 4%,
+    rgba(26, 150, 56, 1) 19%,
+    rgba(48, 159, 128, 1) 45%,
+    rgba(22, 119, 115, 1) 63%,
+    rgba(4, 66, 105, 1) 88%
+  );
+}
+
+.pestaña2 {
+  position: fixed;
+  top: 37%;
+  right: 0;
+  background-color: lightblue;
+  padding: 10px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  cursor: pointer;
+  z-index: 1000;
+  background: rgb(0, 107, 63);
+  color: white;
+  background: linear-gradient(
+    95deg,
+    rgba(0, 107, 63, 1) 4%,
+    rgba(26, 150, 56, 1) 19%,
+    rgba(48, 159, 128, 1) 45%,
+    rgba(22, 119, 115, 1) 63%,
+    rgba(4, 66, 105, 1) 88%
+  );
+}
+
+.pestaña3 {
+  position: fixed;
+  top: 45%;
+  right: 0;
+  background-color: lightblue;
+  padding: 10px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  cursor: pointer;
+  z-index: 1000;
+  background: rgb(0, 107, 63);
+  color: white;
+  background: linear-gradient(
+    95deg,
+    rgba(0, 107, 63, 1) 4%,
+    rgba(26, 150, 56, 1) 19%,
+    rgba(48, 159, 128, 1) 45%,
+    rgba(22, 119, 115, 1) 63%,
+    rgba(4, 66, 105, 1) 88%
+  );
+}
+
+/* Animación para expandir */
+@keyframes expandir {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 300px;
+  }
+}
+
+@keyframes contraer {
+  from {
+    width: 300px;
+  }
+
+  to {
+    width: 0;
+  }
+}
+
+/* Animación para expandir */
+@keyframes expandir2 {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 300px;
+  }
+}
+
+@keyframes contraer2 {
+  from {
+    width: 300px;
+  }
+
+  to {
+    width: 0;
+  }
+}
+
+/* Estilos cuando el div está expandido */
+.expandido {
+  animation: expandir 1s ease;
+  /* Animación para expandir */
+  width: 300px;
+  height: 300px;
+  /* Anchura del contenido expandido */
+}
+
+.pestaña:not(.expandido) {
+  animation: contraer 1s ease;
+  /* Animación para contraer */
+  overflow: hidden;
+  /* Ocultar el contenido al contraer */
+}
+
+/* Estilos cuando el div está expandido */
+.expandido2 {
+  animation: expandir2 1s ease;
+  /* Animación para expandir */
+  width: 300px;
+  height: 300px;
+  /* Anchura del contenido expandido */
+}
+
+.pestaña2:not(.expandido2) {
+  animation: contraer2 1s ease;
+  /* Animación para contraer */
+  overflow: hidden;
+  /* Ocultar el contenido al contraer */
 }
 
 /* .orientacion{
