@@ -127,7 +127,7 @@ export default {
       let self = this;
       let config = this.configHeader();
       axios
-        .post(
+        .get(
           self.URL_API +
             "api/v1/actualizaestadofirma/" +
             item_id +

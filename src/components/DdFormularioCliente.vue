@@ -5568,6 +5568,14 @@ export default {
       });
     },
     limpiarformulario() {
+      this.consulta_responsable_firma = "";
+      this.estado_firma_id = "";
+      this.consulta_estado_firma = "";
+      this.consulta_responsable = "";
+      this.responsable_id = "";
+      this.lista_responsables = [];
+      this.lista_responsables_corregir = [];
+      this.estados_firma_debida_diligencia = [];
       this.cargos = [{ cargo: "", requisitos: [], examenes: [], riesgo: "" }];
       this.cargos2 = [
         {
