@@ -1,6 +1,13 @@
 <template>
   <div id="container2">
     <Loading :loading="loading" />
+    <div v-if="toogleModal">
+      <ModalResponsableDD
+        v-if="estado_firma_id"
+        :estado_firma_id="estado_firma_id"
+      />
+    </div>
+
     <div
       class="row"
       id="container"
@@ -984,7 +991,7 @@
                   >
                     <a
                       class="dropdown-item"
-                      @click="actualizaEstado(item.id, item2.id)"
+                      @click="actualizaEstadoDD(item.id, item2.id)"
                       >{{ item2.nombre }}</a
                     >
                   </li>
@@ -1232,6 +1239,7 @@
 import Vue from "vue";
 import axios from "axios";
 import Modal from "./Modal.vue";
+import ModalResponsableDD from "./ModalResponsableDD.vue";
 import ConsultaContrato from "./ConsultaContrato.vue";
 import FlotanteFormularioIngreso from "./FlotanteFormularioIngreso.vue";
 import FlotanteFormularioRiesgos from "./FlotanteFormularioRiesgos.vue";
@@ -1247,6 +1255,7 @@ export default {
     Loading,
     FlotanteFormularioIngreso,
     FlotanteFormularioRiesgos,
+    ModalResponsableDD,
   },
   mixins: [Token, Alerts, Permisos, Scroll],
   props: {
@@ -1282,6 +1291,7 @@ export default {
   },
   data() {
     return {
+      toogleModal: false,
       lista_encargados_debida_diligencia: [],
       URL_API: process.env.VUE_APP_URL_API,
       sorted: false,
@@ -1345,6 +1355,8 @@ export default {
       endpoint_busqueda_rapida: "",
       estado_ingreso2: {},
       encargado2: {},
+      estado_firma_id: "",
+      formulario_dd_id: "",
     };
   },
 
@@ -1546,6 +1558,12 @@ export default {
     },
     actualizaEstado(item_id, estado) {
       this.$emit("actualizaEstado", item_id, estado, this.currentUrl);
+    },
+    actualizaEstadoDD(item_id, estado /* responsable_id  */) {
+      this.toogleModal = true;
+      this.formulario_dd_id = item_id;
+      this.estado_firma_id = estado;
+      /*  this.$emit("actualizaEstado", item_id, estado, responsable_id, this.currentUrl); */
     },
     empleados() {
       if (this.ruta.split("/")[2] == "empleados") {

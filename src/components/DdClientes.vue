@@ -123,7 +123,7 @@ export default {
           self.showAlert(result.data.message, result.data.status);
         });
     },
-    actualizaEstado(item_id, estado, currenturl = null) {
+    actualizaEstado(item_id, estado, responsable_id, currenturl = null) {
       let self = this;
       let config = this.configHeader();
       axios
@@ -132,7 +132,9 @@ export default {
             "api/v1/actualizaestadofirma/" +
             item_id +
             "/" +
-            estado,
+            estado +
+            "/" +
+            responsable_id,
           config
         )
         .then(function (result) {
