@@ -369,6 +369,49 @@
         <div class="row">
           <div class="col">
             <SearchList
+              nombreCampo="Departamento del rut: *"
+              nombreItem="nombre"
+              eventoCampo="getDepartamentos"
+              :consulta="consulta_departamento_rut"
+              :registros="departamentos"
+              :ordenCampo="5"
+              @getDepartamentos="getDepartamentos({ id: 43 }, 5)"
+              @getMunicipios="getMunicipios"
+              placeholder="Seleccione una opción"
+            />
+          </div>
+          <div class="col">
+            <SearchList
+              nombreCampo="Ciudad del rut: *"
+              nombreItem="nombre"
+              :registros="municipios"
+              :consulta="consulta_municipio_rut"
+              @setMunicipios="setMunicipios"
+              eventoCampo="setMunicipios"
+              :ordenCampo="5"
+              placeholder="Seleccione una opción"
+            />
+          </div>
+          <div class="col mb-3">
+            <label class="form-label">Dirección del rut: * </label>
+            <input
+              type="text"
+              class="form-control"
+              id="exampleInputEmail1"
+              maxlength="100"
+              @input="direccion_rut = formatInputUpperCase($event.target.value)"
+              aria-describedby="emailHelp"
+              v-model="direccion_rut"
+              required
+            />
+            <div class="invalid-feedback">
+              {{ mensaje_error }}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <SearchList
               nombreCampo="Pais: *"
               @getPaises="getPaises"
               eventoCampo="getPaises"
@@ -3672,6 +3715,11 @@ export default {
   },
   data() {
     return {
+      direccion_rut: "",
+      consulta_pais_rut: "Colombia",
+      consulta_departamento_rut: "",
+      consulta_municipio_rut: "",
+      municipio_rut: "",
       seguimiento: [],
       seguimiento_estados: [],
       divExpandido: false,
@@ -4130,6 +4178,9 @@ export default {
           case 4:
             this.consulta_pais_laboratorio = item.nombre;
             break;
+          case 5:
+            this.consulta_pais_rut = "Colombia";
+            break;
         }
       }
     },
@@ -4147,6 +4198,9 @@ export default {
             break;
           case 4:
             this.consulta_departamento_laboratorio = item.nombre;
+            break;
+          case 5:
+            this.conslta_departamento_rut = item.nombre;
             break;
         }
       }
@@ -5559,6 +5613,9 @@ export default {
             this.laboratorios_medicos_agregados = [];
             this.laboratorios_medicos = [];
             break;
+          case 5:
+            this.municipio_rut = item.id;
+            this.consulta_municipio_rut = item.nombre;
         }
       }
     },
@@ -6567,6 +6624,8 @@ export default {
     },
     crearCliente() {
       this.registroCliente = {
+        direccion_rut: this.direccion_rut,
+        municipio_rut: this.municipio_rut,
         estado_firma_id: this.estado_firma_id,
         responsable: this.consulta_responsable_firma,
         responsable_id: this.responsable_id,
@@ -7081,6 +7140,10 @@ export default {
             }
           });
         });
+        this.consulta_departamento_rut = item.departamento_rut;
+        this.departamento_rut = item.departamento_rut_id;
+        this.consulta_municipio_rut = item.municipio_rut;
+        this.municipio_rut = item.municipio_rut_id;
         this.seguimiento = item.seguimiento;
         this.seguimiento_estados = item.seguimiento_estados;
         this.getEncargados(null, item.estado_firma_id);
