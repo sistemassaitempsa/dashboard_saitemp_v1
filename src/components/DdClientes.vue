@@ -12,6 +12,7 @@
       :estados_firma="estados_firma"
       @actualizaEstado="actualizaEstado"
       @actualizaResponsableDD="actualizaResponsableDD"
+      @actualizaEstadoPadre="actualizaEstado"
     />
   </div>
 </template>

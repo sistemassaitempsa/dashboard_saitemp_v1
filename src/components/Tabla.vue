@@ -5,6 +5,9 @@
       <ModalResponsableDD
         v-if="estado_firma_id"
         :estado_firma_id="estado_firma_id"
+        :nombre_estado="nombre_estado"
+        @actualizaEstadoHijo="actualizaEstadoPadreDD"
+        @closeModalDD="closeModalDD"
       />
     </div>
 
@@ -991,7 +994,9 @@
                   >
                     <a
                       class="dropdown-item"
-                      @click="actualizaEstadoDD(item.id, item2.id)"
+                      @click="
+                        actualizaEstadoDD(item.id, item2.id, item2.nombre)
+                      "
                       >{{ item2.nombre }}</a
                     >
                   </li>
@@ -1291,6 +1296,7 @@ export default {
   },
   data() {
     return {
+      nombre_estado: "",
       toogleModal: false,
       lista_encargados_debida_diligencia: [],
       URL_API: process.env.VUE_APP_URL_API,
@@ -1559,10 +1565,25 @@ export default {
     actualizaEstado(item_id, estado) {
       this.$emit("actualizaEstado", item_id, estado, this.currentUrl);
     },
-    actualizaEstadoDD(item_id, estado /* responsable_id  */) {
+    closeModalDD() {
+      this.toogleModal = false;
+    },
+    actualizaEstadoPadreDD(responsable_id, estado_firma_id) {
+      this.toogleModal = false;
+      this.$emit(
+        "actualizaEstadoPadre",
+        this.formulario_dd_id,
+        estado_firma_id,
+        responsable_id,
+        this.currentUrl
+      );
+    },
+
+    actualizaEstadoDD(item_id, estado, nombre_estado) {
       this.toogleModal = true;
       this.formulario_dd_id = item_id;
       this.estado_firma_id = estado;
+      this.nombre_estado = nombre_estado;
       /*  this.$emit("actualizaEstado", item_id, estado, responsable_id, this.currentUrl); */
     },
     empleados() {
@@ -1612,6 +1633,7 @@ export default {
         self.valor_comparar2;
       this.base64consulta = btoa(cadena);
     },
+
     filtrar() {
       let self = this;
       this.scrollTop();

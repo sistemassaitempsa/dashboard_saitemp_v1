@@ -4,7 +4,7 @@
       <div class="container">
         <div class="row">
           <div class="col">
-            <label>{{ "holi" }}</label>
+            <label>{{ nombre_estado }}</label>
           </div>
         </div>
         <div class="row">
@@ -23,10 +23,14 @@
         </div>
         <div class="row">
           <div class="col">
-            <button type="button" @click="close">Cancelar</button>
+            <button type="button" class="buttonCancel" @click="close">
+              Cancelar
+            </button>
           </div>
           <div class="col">
-            <button type="button" @click="saveResponsableDD">Guardar</button>
+            <button type="button" class="buttonSave" @click="saveResponsableDD">
+              Guardar
+            </button>
           </div>
         </div>
       </div>
@@ -48,6 +52,10 @@ export default {
   props: {
     estado_firma_id: {
       type: [String, Number], // Usa los constructores `String` y `Number` sin comillas
+      required: true,
+    },
+    nombre_estado: {
+      type: [String], // Usa los constructores `String` y `Number` sin comillas
       required: true,
     },
   },
@@ -85,14 +93,18 @@ export default {
           });
       }
     },
-    close() {},
+    close() {
+      this.$emit("closeModalDD");
+    },
     saveResponsableDD() {
       if (this.responsable_id != "") {
         this.$emit(
-          "actualizaEstado",
+          "actualizaEstadoHijo",
           this.responsable_id,
-          this.consulta_responsable_firma
+          this.estado_firma_id
         );
+      } else {
+        this.showAlert("Debe seleccionar un responsable", "error");
       }
     },
   },
@@ -133,17 +145,31 @@ export default {
   }
 }
 
-button {
+.buttonSave {
   margin-top: 10px;
   padding: 10px;
-  background-color: #007bff;
+  background-color: #006b3f;
   color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: 0.8s;
 }
 
-button:hover {
-  background-color: #0056b3;
+.buttonSave:hover {
+  background-color: #0d5436;
+}
+.buttonCancel {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: rgb(226, 74, 74);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.8s;
+}
+.buttonCancel:hover {
+  background-color: #dd1d1d;
 }
 </style>
