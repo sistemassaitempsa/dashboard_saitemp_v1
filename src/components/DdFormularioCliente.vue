@@ -106,7 +106,6 @@
               :consulta="consulta_responsable_firma"
               :registros="lista_responsables"
               placeholder="Seleccione una opción"
-              :valida_campo="replica > 1"
             />
           </div>
         </div>
@@ -3534,6 +3533,63 @@
           </div>
         </div>
       </div>
+      <h6 v-if="$route.params.id != undefined" class="tituloseccion">
+        Observaciones del responsable.
+      </h6>
+      <div id="seccion" v-if="$route.params.id != undefined">
+        <div class="row">
+          <div class="col-6">
+            <SearchList
+              nombreCampo="Novedad en servicio: *"
+              nombreItem="nombre"
+              :registros="observaciones_estado"
+              @getObservacionesEstado="getObservacionesEstado"
+              eventoCampo="getObservacionesEstado"
+              :ordenCampo="2"
+              placeholder="Seleccione una opción"
+              :consulta="consulta_observacion_estado"
+              :valida_campo="true"
+              :disabled="bloquea_campos && !permisos[26].autorizado"
+            />
+          </div>
+          <div
+            class="col mb-6"
+            v-if="consulta_observacion_estado == 'Servicio no conforme'"
+          >
+            <label class="form-label">Observaciones no conformidad: </label>
+            <textarea
+              name=""
+              id="afectacion_servicio"
+              class="form-control"
+              rows="1"
+              v-model="afectacion_servicio"
+              placeholder="Solo para no conformidades"
+              @input="
+                afectacion_servicio = formatInputUpperCase($event.target.value)
+              "
+              :disabled="bloquea_campos && !permisos[26].autorizado"
+            ></textarea>
+          </div>
+        </div>
+        <div class="row">
+          <div
+            class="col-6"
+            v-if="consulta_observacion_estado == 'Servicio no conforme'"
+          >
+            <SearchList
+              nombreCampo="Corregir por: "
+              @getEncargadosCorregir="getEncargadosCorregir"
+              eventoCampo="getEncargadosCorregir"
+              nombreItem="nombre"
+              :consulta="consulta_encargado_corregir"
+              :registros="lista_encargados_corregir"
+              placeholder="Seleccione una opción"
+              :valida_campo="false"
+              :disabled="bloquea_campos && !permisos[26].autorizado"
+            />
+          </div>
+        </div>
+      </div>
       <div class="col-3" v-if="hide_bottons">
         <SearchList
           nombreCampo="Registros guardados"
@@ -3709,12 +3765,30 @@ export default {
   },
   mixins: [Scroll, Alerts, Token, Permisos],
   props: {
+    menu: [],
     userlogued: {
       default: "",
     },
   },
   data() {
     return {
+      bloquea_campos: false,
+      menu_id: "",
+      encargado_corregir_correo: "",
+      encargado_id_copia: "",
+      correoResponsable: "",
+      responsable_id_copia: "",
+      estado_firma_id_copia: "",
+      correosSeleccionados: {
+        correos: [],
+      },
+      novedad_servicio: "",
+      consulta_encargado_corregir: "",
+      encargado_id: "",
+      lista_encargados_corregir: [],
+      afectacion_servicio: "",
+      consulta_observacion_estado: "",
+      observaciones_estado: [],
       direccion_rut: "",
       consulta_pais_rut: "Colombia",
       consulta_departamento_rut: "",
@@ -4094,10 +4168,14 @@ export default {
   watch: {
     $route() {
       this.limpiarformulario();
+      this.getModulo();
     },
     // tipo_cargo() {
     //     this.getSubCategoriaCargo(this.tipo_cargo)
     // }
+  },
+  menu() {
+    this.getModulo();
   },
   mounted() {
     window.addEventListener("keydown", this.convinacionGuardado);
@@ -4109,6 +4187,7 @@ export default {
   },
   created() {
     // const urlCompleta = window.location.href;
+    this.getModulo();
     this.urlExterna();
     // if (urlCompleta.includes('debidadiligencia.saitempsa.com')) {
     //     this.URL_API = 'http://debidadiligencia.saitempsa.com:8484/aplicaciones/api/public/'
@@ -6583,7 +6662,21 @@ export default {
         this.loading = false;
         return;
       }
-
+      if (this.correoResponsable) {
+        this.correosSeleccionados.correos.push({
+          correo: this.correoResponsable,
+          observacion: "",
+          corregir: false,
+        });
+      }
+      if (this.ecargado_corregir_correo) {
+        this.correosSeleccionados.correos.push({
+          correo: this.ecargado_corregir_correo,
+          observacion: this.afectacion_servicio,
+          corregir: true,
+        });
+      }
+      console.log(this.correosSeleccionados);
       try {
         this.crearCliente();
         let config = this.configHeader();
@@ -6622,8 +6715,24 @@ export default {
         console.log(error);
       }
     },
+    getObservacionesEstado(item = null) {
+      if (item != null) {
+        this.consulta_observacion_estado = item.nombre;
+        this.novedad_servicio = item.id;
+      }
+      let self = this;
+      let config = this.configHeader();
+      axios
+        .get(self.URL_API + "api/v1/observacionestado", config)
+        .then(function (result) {
+          self.observaciones_estado = result.data;
+        });
+    },
     crearCliente() {
       this.registroCliente = {
+        novedad_servicio: this.novedad_servicio,
+        usuario_corregir_id: this.encargado_id,
+        afectacion_servicio: this.afectacion_servicio,
         direccion_rut: this.direccion_rut,
         municipio_rut: this.municipio_rut,
         estado_firma_id: this.estado_firma_id,
@@ -6818,6 +6927,9 @@ export default {
         this.responsable_id = item.usuario_id;
         this.consulta_encargado = item.nombre;
         this.consulta_responsable_firma = item.nombre;
+        if (this.responsable_id != this.responsable_id_copia) {
+          this.correoResponsable = item.email;
+        }
       }
       if (id != null) {
         let self = this;
@@ -7129,7 +7241,40 @@ export default {
         item.calidad_tributaria[0].numero_resolucion;
       this.calidad_tributaria[2].fecha = item.calidad_tributaria[0].fecha;
     },
-
+    getEncargadosCorregir(item = null) {
+      if (item != null) {
+        this.encargado_id = item.usuario_id;
+        this.consulta_encargado_corregir = item.nombre;
+        if (this.encargado_id != this.encargado_id_copia) {
+          this.encargado_corregir_correo = item.email;
+        }
+      }
+      let self = this;
+      let config = this.configHeader();
+      axios
+        .get(self.URL_API + "api/v1/estadoResponsableFirma ", config)
+        .then(function (result) {
+          self.lista_encargados_corregir = result.data;
+        });
+    },
+    getModulo() {
+      var self = this;
+      if (self.$route.path != "/navbar/gestion-ingresosl") {
+        var ruta =
+          self.$route.path.split("/")[1] +
+          "/" +
+          self.$route.path.split("/")[2] +
+          "/" +
+          self.$route.path.split("/")[3];
+        this.menu.forEach(function (item) {
+          item.opciones.forEach((element) => {
+            if (element.url == ruta) {
+              self.menu_id = element.id;
+            }
+          });
+        });
+      }
+    },
     llenarFormulario(item = null) {
       try {
         let self = this;
@@ -7140,6 +7285,12 @@ export default {
             }
           });
         });
+        this.bloquea_campos = true;
+        this.consulta_encargado_corregir = item.nombre_usuario_corregir;
+        this.afectacion_servicio = item.afectacion_servicio;
+        this.encargado_id = item.usuario_corregir_id;
+        this.encargado_id_copia = item.usuario_corregir_id;
+        this.estado_firma_id_copia = item.estado_firma_id;
         this.consulta_departamento_rut = item.departamento_rut;
         this.departamento_rut = item.departamento_rut_id;
         this.consulta_municipio_rut = item.municipio_rut;
@@ -7147,6 +7298,7 @@ export default {
         this.seguimiento = item.seguimiento;
         this.seguimiento_estados = item.seguimiento_estados;
         this.getEncargados(null, item.estado_firma_id);
+        this.responsable_id_copia = item.responsable_id;
         this.responsable_id = item.responsable_id;
         this.estado_firma_id = item.estado_firma_id;
         this.consulta_responsable_firma = item.responsable;

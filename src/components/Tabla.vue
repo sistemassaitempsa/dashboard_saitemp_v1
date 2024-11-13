@@ -968,7 +968,7 @@
                 >
                   {{
                     truncateText(
-                      item.nombre_estado_firma,
+                      item.nombre_estado_firma ? item.nombre_estado_firma : "",
                       maxCaracteres,
                       item.id
                     )
