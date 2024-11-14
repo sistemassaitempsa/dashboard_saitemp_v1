@@ -10,7 +10,6 @@
       :listas="listas"
       :endpointexport="endpointexport"
       :estados_firma="estados_firma"
-      @actualizaEstado="actualizaEstado"
       @actualizaResponsableDD="actualizaResponsableDD"
       @actualizaEstadoPadre="actualizaEstado"
     />
@@ -104,8 +103,19 @@ export default {
       item_id,
       responsable_id,
       responsable_ingreso,
+      email_reponsable,
       currenturl = null
     ) {
+      let correosSeleccionados = {
+        correos: [],
+      };
+      if (email_reponsable) {
+        correosSeleccionados.correos.push({
+          correo: email_reponsable,
+          observacion: "",
+          corregir: false,
+        });
+      }
       let self = this;
       let config = this.configHeader();
       axios
@@ -122,11 +132,30 @@ export default {
         .then(function (result) {
           self.estadoActualizado(currenturl);
           self.showAlert(result.data.message, result.data.status);
+          if (result.data.status == "success") {
+            self.enviarCorreos(item_id, correosSeleccionados);
+          }
         });
     },
-    actualizaEstado(item_id, estado, responsable_id, currenturl = null) {
+    actualizaEstado(
+      item_id,
+      estado,
+      responsable_id,
+      correo_responsable,
+      currenturl = null
+    ) {
       let self = this;
       let config = this.configHeader();
+      let correosSeleccionados = {
+        correos: [],
+      };
+      if (correo_responsable) {
+        correosSeleccionados.correos.push({
+          correo: correo_responsable,
+          observacion: "",
+          corregir: false,
+        });
+      }
       axios
         .get(
           self.URL_API +
@@ -141,6 +170,9 @@ export default {
         .then(function (result) {
           self.estadoActualizado(currenturl);
           self.showAlert(result.data.message, result.data.status);
+          if (result.data.status == "success") {
+            self.enviarCorreos(item_id, correosSeleccionados);
+          }
         });
     },
     llenarLista() {
@@ -170,6 +202,20 @@ export default {
       axios.get(currentUrl, config).then(function (result) {
         self.datos = result;
       });
+    },
+    enviarCorreos(id, correosResponsables) {
+      this.loading = true;
+      let config = this.configHeader();
+      axios
+        .post(
+          this.URL_API + "api/v1/enviarCorreoDD/" + id,
+          correosResponsables,
+          config
+        )
+        .then((response) => {
+          this.showAlert(response.data.message, response.data.status);
+          this.loading = false;
+        });
     },
     getEjecutivosComerciales() {
       let self = this;

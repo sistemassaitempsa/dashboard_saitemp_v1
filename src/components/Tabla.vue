@@ -1539,6 +1539,7 @@ export default {
         item_id,
         this.lista_encargados_debida_diligencia[index].usuario_id,
         this.lista_encargados_debida_diligencia[index].nombre,
+        this.lista_encargados_debida_diligencia[index].email,
         this.currentUrl
       );
       setTimeout(() => {
@@ -1568,13 +1569,18 @@ export default {
     closeModalDD() {
       this.toogleModal = false;
     },
-    actualizaEstadoPadreDD(responsable_id, estado_firma_id) {
+    actualizaEstadoPadreDD(
+      responsable_id,
+      estado_firma_id,
+      correo_responsable
+    ) {
       this.toogleModal = false;
       this.$emit(
         "actualizaEstadoPadre",
         this.formulario_dd_id,
         estado_firma_id,
         responsable_id,
+        correo_responsable,
         this.currentUrl
       );
     },

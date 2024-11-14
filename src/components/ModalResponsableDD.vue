@@ -63,6 +63,7 @@ export default {
     return {
       consulta_responsable_firma: "",
       lista_encargados_debida_diligencia: "",
+      correo_responsable: "",
       responsable_id: "",
       consulta_encargado: "",
       lista_responsables: "",
@@ -77,6 +78,7 @@ export default {
         this.responsable_id = item.usuario_id;
         this.consulta_encargado = item.nombre;
         this.consulta_responsable_firma = item.nombre;
+        this.correo_responsable = item.email;
       }
       if (this.estado_firma_id != 0) {
         let self = this;
@@ -101,7 +103,8 @@ export default {
         this.$emit(
           "actualizaEstadoHijo",
           this.responsable_id,
-          this.estado_firma_id
+          this.estado_firma_id,
+          this.correo_responsable
         );
       } else {
         this.showAlert("Debe seleccionar un responsable", "error");
