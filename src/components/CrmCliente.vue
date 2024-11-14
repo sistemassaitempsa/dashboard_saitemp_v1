@@ -1948,9 +1948,7 @@ export default {
         for (let i = 0; i < item.compromisos.length; i++) {
           const compromiso = item.compromisos[i];
 
-          // Verificar si compromiso es null y reemplazar observacion
           if (compromiso) {
-            // Cambiar observacion a "" si es null
             this.compromisos[i] = {
               ...compromiso,
               observacion: compromiso.observacion ?? "",

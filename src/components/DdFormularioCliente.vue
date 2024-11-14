@@ -4180,6 +4180,7 @@ export default {
   mounted() {
     window.addEventListener("keydown", this.convinacionGuardado);
     window.addEventListener("keydown", this.convinacionAutoRelleno);
+    this.getModulo();
   },
   beforeDestroy() {
     window.removeEventListener("keydown", this.convinacionGuardado);
@@ -6648,6 +6649,20 @@ export default {
       });
       return false;
     },
+    enviarCorreos(id, modulo, correosResponsables) {
+      this.loading = true;
+      let config = this.configHeader();
+      axios
+        .post(
+          this.URL_API + "api/v1/enviarCorreoDD/" + id,
+          correosResponsables,
+          config
+        )
+        .then((response) => {
+          this.showAlert(response.data.message, response.data.status);
+          this.loading = false;
+        });
+    },
     save(registro_cambios = null) {
       let self = this;
       this.loading = true;
@@ -6669,14 +6684,13 @@ export default {
           corregir: false,
         });
       }
-      if (this.ecargado_corregir_correo) {
+      if (this.encargado_corregir_correo) {
         this.correosSeleccionados.correos.push({
-          correo: this.ecargado_corregir_correo,
+          correo: this.encargado_corregir_correo,
           observacion: this.afectacion_servicio,
           corregir: true,
         });
       }
-      console.log(this.correosSeleccionados);
       try {
         this.crearCliente();
         let config = this.configHeader();
@@ -6692,6 +6706,11 @@ export default {
               if (result.data.message == "ok") {
                 self.guardarArchivos(result.data.client);
                 self.cliente_existe = true;
+                self.enviarCorreos(
+                  result.data.client,
+                  self.menu_id,
+                  self.correosSeleccionados
+                );
               } else {
                 this.loading = false;
                 self.showAlert(result.data.message, result.data.status);
@@ -6708,6 +6727,11 @@ export default {
             .then(function (result) {
               if (result.data.message == "ok") {
                 self.guardarArchivos(result.data.client);
+                self.enviarCorreos(
+                  result.data.client,
+                  self.menu_id,
+                  self.correosSeleccionados
+                );
               }
             });
         }
@@ -7245,6 +7269,8 @@ export default {
       if (item != null) {
         this.encargado_id = item.usuario_id;
         this.consulta_encargado_corregir = item.nombre;
+        console.log(this.encargado_id);
+        console.log(this.encargado_id_copia);
         if (this.encargado_id != this.encargado_id_copia) {
           this.encargado_corregir_correo = item.email;
         }
@@ -7270,6 +7296,7 @@ export default {
           item.opciones.forEach((element) => {
             if (element.url == ruta) {
               self.menu_id = element.id;
+              console.log(element.id);
             }
           });
         });
