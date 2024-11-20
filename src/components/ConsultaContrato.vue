@@ -886,10 +886,10 @@ export default {
       this.seccion4();
       this.seccion6();
       this.seccion7();
-      if (this.index === 0) {
+      if (this.index == 0) {
         // Abrir el PDF en una nueva ventana
         pdfMake.createPdf(this.docDefinition).open();
-      } else if (this.index === 1) {
+      } else if (this.index == 1) {
         // Emitir el PDF como Blob al componente padre
         pdfMake.createPdf(this.docDefinition).getBlob((blob) => {
           this.$emit("pdf-generated", blob);

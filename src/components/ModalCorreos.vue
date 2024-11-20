@@ -111,7 +111,12 @@
               </button>
             </div>
             <div class="col">
-              <ConsultaContrato class="ct" :item_id="registro_id" :index="1" />
+              <ConsultaContrato
+                @pdf-generated="handlePdfGenerated"
+                class="ct"
+                :item_id="registro_id"
+                :index="1"
+              />
             </div>
           </div>
         </form>
@@ -208,6 +213,21 @@ export default {
     },
     close() {
       this.$emit("closeModalCorreos");
+    },
+    handlePdfGenerated(blob) {
+      let self = this;
+      let config = this.configHeader();
+      const formData = new FormData();
+      formData.append("file", blob, "documento.pdf");
+      axios
+        .post(
+          self.URL_API + "api/v1/uploadFileValidart/" + this.registro_id,
+          formData,
+          config
+        )
+        .then((result) => {
+          console.log(result);
+        });
     },
   },
 };
