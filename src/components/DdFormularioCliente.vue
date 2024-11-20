@@ -3726,15 +3726,25 @@
               <li v-if="permisos[0].autorizado && ruta_id != undefined">
                 <ConsultaContrato class="ct" :item_id="ruta_id" />
               </li>
+              <li v-if="permisos[0].autorizado && ruta_id != undefined">
+                <hr class="dropdown-divider" />
+              </li>
+              <li v-if="permisos[0].autorizado && ruta_id != undefined">
+                <button type="button" class="btn btn-success btn-sm">
+                  Enviar contrato
+                </button>
+              </li>
             </ul>
           </div>
         </div>
       </div>
     </form>
+    <ModalCorreos :representante_legal="representantes_legales[0]" :registro_id="ruta_id"></ModalCorreos>
   </div>
 </template>
 <script>
 import axios from "axios";
+import ModalCorreos from "./ModalCorreos.vue";
 import SearchList from "./SearchList.vue";
 import SearchTable from "./SearchTable.vue";
 import ListaMultiple from "./ListaMultiple.vue";
@@ -3753,6 +3763,7 @@ import FlotanteSelecciondd from "./FlotanteSelecciondd.vue";
 
 export default {
   components: {
+    ModalCorreos,
     SearchList,
     SearchTable,
     ListaMultiple,
@@ -7312,6 +7323,7 @@ export default {
             }
           });
         });
+        this.direccion_rut = item.dirección_rut;
         this.bloquea_campos = true;
         this.consulta_encargado_corregir = item.nombre_usuario_corregir;
         this.afectacion_servicio = item.afectacion_servicio;
