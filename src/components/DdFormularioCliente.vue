@@ -3729,9 +3729,28 @@
               <li v-if="permisos[0].autorizado && ruta_id != undefined">
                 <hr class="dropdown-divider" />
               </li>
-              <li v-if="permisos[0].autorizado && ruta_id != undefined">
-                <button type="button" class="btn btn-success btn-sm">
+              <li
+                v-if="
+                  permisos[0].autorizado &&
+                  ruta_id != undefined &&
+                  estado_firma_id_copia == 4
+                "
+              >
+                <button
+                  v-if="!contrato[0]"
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  @click="openModalFirmas"
+                >
                   Enviar contrato
+                </button>
+                <button
+                  v-if="contrato[0]"
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  @click="openModalEstadoContrato"
+                >
+                  Estado contrato enviado
                 </button>
               </li>
             </ul>
@@ -3739,7 +3758,19 @@
         </div>
       </div>
     </form>
-    <ModalCorreos :representante_legal="representantes_legales[0]" :registro_id="ruta_id"></ModalCorreos>
+    <div v-if="toogleModalFirmas">
+      <ModalCorreos
+        :representante_legal="representantes_legales[0]"
+        :registro_id="ruta_id"
+        @closeModalCorreos="closeModalCorreos"
+      ></ModalCorreos>
+    </div>
+    <div v-if="toogleModalEstadoContrato">
+      <ModalEstadoContrato
+        :contrato="contrato[0]"
+        @closeModalEstadoContrato="closeModalEstadoContrato"
+      ></ModalEstadoContrato>
+    </div>
   </div>
 </template>
 <script>
@@ -3760,9 +3791,11 @@ import ConsultaContrato from "./ConsultaContrato.vue";
 import RegistroCambio from "./RegistroCambio.vue";
 import FlotanteInteraccionCliente from "./FlotanteInteraccionCliente.vue";
 import FlotanteSelecciondd from "./FlotanteSelecciondd.vue";
+import ModalEstadoContrato from "./ModalEstadoContrato.vue";
 
 export default {
   components: {
+    ModalEstadoContrato,
     ModalCorreos,
     SearchList,
     SearchTable,
@@ -3783,6 +3816,9 @@ export default {
   },
   data() {
     return {
+      toogleModalEstadoContrato: false,
+      contrato: [],
+      toogleModalFirmas: false,
       bloquea_campos: false,
       menu_id: "",
       encargado_corregir_correo: "",
@@ -6945,6 +6981,14 @@ export default {
           self.estados_firma_debida_diligencia = result.data;
         });
     },
+    closeModalCorreos() {
+      this.toogleModalFirmas = false;
+      this.consultaFormulario(this.$route.params.id);
+    },
+    closeModalEstadoContrato() {
+      this.toogleModalEstadoContrato = false;
+      this.consultaFormulario(this.$route.params.id);
+    },
     reformatearFecha(fechaOriginal) {
       const fechaHora = new Date(fechaOriginal);
       const año = fechaHora.getFullYear();
@@ -6956,6 +7000,12 @@ export default {
       const fechaFormateada = `${dia}/${mes}/${año}  `;
       const horaFormateada = `${horas}:${minutos}:${segundos}`;
       return fechaFormateada + " " + horaFormateada;
+    },
+    openModalFirmas() {
+      this.toogleModalFirmas = true;
+    },
+    openModalEstadoContrato() {
+      this.toogleModalEstadoContrato = true;
     },
     getEncargados(item = null, id = null) {
       if (item != null) {
@@ -7323,6 +7373,7 @@ export default {
             }
           });
         });
+        this.contrato = item.contrato;
         this.direccion_rut = item.dirección_rut;
         this.bloquea_campos = true;
         this.consulta_encargado_corregir = item.nombre_usuario_corregir;

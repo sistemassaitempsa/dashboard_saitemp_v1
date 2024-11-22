@@ -156,7 +156,6 @@ export default {
     validarSeleccion() {
       if (!this.seleccionado) {
         this.registro = "";
-        this.error = true;
       } else {
         this.error = false;
       }

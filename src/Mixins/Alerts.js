@@ -36,7 +36,7 @@ export const Alerts = {
         })
         .then((result) => {
           if (result.isConfirmed) {
-            funcion(id);
+            return funcion(id);
           }
         });
     },

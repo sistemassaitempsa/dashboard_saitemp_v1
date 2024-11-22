@@ -1,6 +1,7 @@
 <template>
-  <div class="modal-overlay" @click="close">
+  <div class="modal-overlay">
     <div class="modal-content" @click.stop>
+      <Loading :loading="loading" />
       <div class="principalContainer">
         <h3>Información firmantes</h3>
         <form action="submit">
@@ -8,42 +9,49 @@
             <h6>Representante legal cliente</h6>
             <div class="row">
               <div class="col">
-                <label for="" class="form-check-label">Nombre</label>
+                <label for="" class="form-check-label">Nombre *</label>
                 <input
                   class="form-control"
                   type="text"
                   v-model="cliente.Nombre"
                   :disabled="disableCliente"
+                  required
                 />
               </div>
               <div class="col">
                 <label for="" class="form-check-label"
-                  >Correo electrónico</label
+                  >Correo electrónico *</label
                 >
                 <input
                   class="form-control"
                   type="text"
                   v-model="cliente.Email"
                   :disabled="disableCliente"
+                  required
                 />
               </div>
             </div>
             <div class="row">
               <div class="col-6">
                 <label for="" class="form-check-label"
-                  >Teléfono de contacto</label
+                  >Teléfono de contacto *</label
                 >
                 <input
                   class="form-control"
                   type="text"
                   v-model="cliente.Telefono"
                   :disabled="disableCliente"
+                  required
                 />
               </div>
               <div class="col-1">
                 <button
                   @click="editarCliente"
-                  class="btn btn-warning btn-sm mt-5"
+                  :class="
+                    disableCliente
+                      ? 'btn btn-warning btn-sm mt-5'
+                      : 'btn btn-success btn-sm mt-5'
+                  "
                   type="button"
                 >
                   <i class="bi bi-pencil-square"></i>
@@ -55,43 +63,50 @@
             <h6>Saitemp</h6>
             <div class="row">
               <div class="col">
-                <label for="" class="form-check-label">Nombre</label>
+                <label for="" class="form-check-label">Nombre *</label>
                 <input
                   class="form-control"
                   type="text"
                   v-model="saitemp.Nombre"
                   :disabled="disableSaitemp"
+                  required
                 />
               </div>
               <div class="col">
                 <label for="" class="form-check-label"
-                  >Correo electrónico</label
+                  >Correo electrónico *</label
                 >
                 <input
                   class="form-control"
                   type="text"
                   v-model="saitemp.Email"
                   :disabled="disableSaitemp"
+                  required
                 />
               </div>
             </div>
             <div class="row">
               <div class="col-6">
                 <label for="" class="form-check-label"
-                  >Teléfono de contacto</label
+                  >Teléfono de contacto *</label
                 >
                 <input
                   class="form-control"
                   type="text"
                   v-model="saitemp.Telefono"
                   :disabled="disableSaitemp"
+                  required
                 />
               </div>
               <div class="col-1">
                 <div class="buttonContainer">
                   <button
                     @click="editarSaitemp"
-                    class="btn btn-warning btn-sm mt-5"
+                    :class="
+                      disableSaitemp
+                        ? 'btn btn-warning btn-sm mt-5'
+                        : 'btn btn-success btn-sm mt-5'
+                    "
                     type="button"
                   >
                     <i class="bi bi-pencil-square"></i>
@@ -128,11 +143,11 @@
 import ConsultaContrato from "./ConsultaContrato.vue";
 import { Alerts } from "../Mixins/Alerts.js";
 import { Token } from "../Mixins/Token.js";
-/* import Loading from "./Loading.vue"; */
+import Loading from "./Loading.vue";
 import { Permisos } from "../Mixins/Permisos.js";
 import axios from "axios";
 export default {
-  components: { ConsultaContrato },
+  components: { ConsultaContrato, Loading },
   props: {
     registro_id: {
       tipe: String,
@@ -185,6 +200,7 @@ export default {
         Contador: "2",
         PruebaVida: "0",
       },
+      loading: false,
       disableCliente: true,
       disableSaitemp: true,
     };
@@ -194,6 +210,7 @@ export default {
   },
   methods: {
     llenarFormulario() {
+      this.loading = true;
       let self = this;
       let config = this.configHeader();
       axios
@@ -202,6 +219,7 @@ export default {
           if (result.data.length > 0) {
             self.saitemp.Nombre = result.data[0].nombres;
             self.saitemp.Email = result.data[0].usuario;
+            self.loading = false;
           }
         });
     },
@@ -215,8 +233,40 @@ export default {
       this.$emit("closeModalCorreos");
     },
     handlePdfGenerated(blob) {
+      this.loading = true;
       let self = this;
       let config = this.configHeader();
+      if (
+        this.cliente.Nombre == "" ||
+        this.cliente.Email == "" ||
+        this.cliente.Telefono == ""
+      ) {
+        this.showAlert(
+          "Debe diligenciar todos los campos del representante legal.",
+          "error"
+        );
+        this.loading = false;
+        return;
+      }
+      if (
+        this.saitemp.Nombre == "" ||
+        this.saitemp.Email == "" ||
+        this.saitemp.Telefono == ""
+      ) {
+        this.showAlert(
+          "Debe diligenciar todos los campos de Saitemp.",
+          "error"
+        );
+        this.loading = false;
+        return;
+      }
+      let firmantes = [];
+      firmantes.push(this.cliente);
+      firmantes.push(this.saitemp);
+      let request = {
+        firmantes: firmantes,
+      };
+      console.log(firmantes);
       const formData = new FormData();
       formData.append("file", blob, "documento.pdf");
       axios
@@ -226,7 +276,19 @@ export default {
           config
         )
         .then((result) => {
-          console.log(result);
+          if (result.data.status == "success") {
+            axios
+              .post(
+                self.URL_API + "api/v1/firmaValidart/" + this.registro_id,
+                request,
+                config
+              )
+              .then((result) => {
+                self.showAlert(result.data.token.mensaje, result.data.status);
+                self.loading = false;
+                this.close();
+              });
+          }
         });
     },
   },
