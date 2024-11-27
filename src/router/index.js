@@ -71,6 +71,7 @@ import GuiaRiesgos from "../components/GuiaRiesgos.vue";
 import Landing from "../components/Landing.vue";
 import Configuraciones from "../components/Configuraciones.vue";
 import EstadosDebidaDIligenciaAdmin from "../components/EstadosDebidaDiligenciaAdmin.vue";
+import ViewTablaHistoricoEstadosDd from "@/components/ViewTablaHistoricoEstadosDd.vue";
 
 Vue.use(VueRouter);
 
@@ -264,6 +265,11 @@ const routes = [
         path: "debida-diligencia/clientes",
         name: "debida-diligencia/clientes",
         component: DdClientes,
+      },
+      {
+        path: "debida-diligencia/historico-estados",
+        name: "debida-diligencia/historico-estados",
+        component: ViewTablaHistoricoEstadosDd,
       },
       {
         path: "debida-diligencia/formulario-clientes/:id?",

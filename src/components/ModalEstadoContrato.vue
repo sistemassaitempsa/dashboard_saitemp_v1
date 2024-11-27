@@ -21,8 +21,13 @@
               required
             />
           </div>
-          <div class="col-1 mt-4">
+          <div class="col-1 mt-4 tooltip-container">
             <label for=""><i class="bi bi-question-circle"></i></label>
+
+            <span class="tooltip-text"
+              >Para modificar los correos electrónicos primero debe anular el
+              contrato actual.</span
+            >
           </div>
           <div class="col">
             <div class="row">
@@ -71,8 +76,13 @@
               required
             />
           </div>
-          <div class="col-1 mt-4">
+          <div class="col-1 mt-4 tooltip-container">
             <label for=""><i class="bi bi-question-circle"></i></label>
+
+            <span class="tooltip-text"
+              >Para modificar los correos electrónicos primero debe anular el
+              contrato actual.</span
+            >
           </div>
           <div class="col">
             <div class="row">
@@ -134,8 +144,8 @@
             <label for="" class="form-check-label">Fecha de envio:</label>
             <input
               class="form-control"
-              type="date"
-              :value="contrato.created_at"
+              type="text"
+              :value="formatearFecha"
               disabled
               required
             />
@@ -213,26 +223,46 @@ export default {
   },
   mixins: [Alerts, Token, Permisos],
   computed: {
+    formatearFecha: {
+      get() {
+        var fecha = new Date(this.contrato.created_at);
+        var year = fecha.getFullYear();
+        var month = ("0" + (fecha.getMonth() + 1)).slice(-2);
+        var day = ("0" + fecha.getDate()).slice(-2);
+        var formattedDate = `${day}/${month}/${year}`;
+        console.log(formattedDate);
+        return formattedDate;
+      },
+    },
     tipo_firmado_cliente: {
       get() {
-        return this.contrato.firmado_cliente === 1 ? "si" : "no";
+        return this.firmado_cliente_com === 1 ? "si" : "no";
       },
     },
     tipo_firmado_empresa: {
       get() {
-        return this.contrato.firmado_empresa === 1 ? "si" : "no";
+        return this.firmado_empresa_com === 1 ? "si" : "no";
       },
     },
+  },
+  created() {
+    this.getEstadoFirmantes();
+  },
+  mounted() {
+    this.getEstadoFirmantes();
   },
   data() {
     return {
       loading: false,
+      firmado_empresa_com: 0,
+      firmado_cliente_com: 0,
     };
   },
   methods: {
     close() {
       this.$emit("closeModalEstadoContrato");
     },
+
     reenviarContratoController() {
       let self = this;
       let config = this.configHeader();
@@ -245,6 +275,25 @@ export default {
         .then((result) => {
           self.showAlert(result.data.response.mensaje, result.data.status);
           self.loading = false;
+        });
+    },
+    getEstadoFirmantes() {
+      this.loading = true;
+      let self = this;
+      let config = this.configHeader();
+      axios
+        .get(
+          self.URL_API +
+            "api/v1/consultaFirmantes/" +
+            this.contrato.transaccion_id,
+          config
+        )
+        .then((result) => {
+          this.loading = false;
+          if (result.data.status == "success") {
+            this.firmado_cliente_com = result.data.contrato.firmado_cliente;
+            this.firmado_empresa_com = result.data.contato.firmado_empresa;
+          }
         });
     },
     anularContratoController() {
@@ -325,5 +374,44 @@ label {
 }
 .buttonContainer {
   height: 20px;
+}
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  font-size: 0.8em;
+  width: 250px;
+  background-color: #fff7d4;
+  color: #444343;
+  text-align: center;
+  border-radius: 4px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 85%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: 0 0 12px #111;
+}
+.tooltip-text::before {
+  content: "";
+  width: 1em;
+  height: 1em;
+  background-color: #fff7d4;
+  position: absolute;
+  bottom: -6.5px;
+  left: 40%;
+  transform: translate(-50%, 0%) rotate(45deg);
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }
 </style>

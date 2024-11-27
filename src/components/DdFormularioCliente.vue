@@ -666,9 +666,9 @@
               id="acuerdos_comerciales"
               class="form-control"
               rows="1"
-              v-model="acuerdos_comerciales"
+              v-model="acuerdo_comercial"
               @input="
-                acuerdos_comerciales = formatInputUpperCase($event.target.value)
+                acuerdo_comercial = formatInputUpperCase($event.target.value)
               "
             ></textarea>
           </div>
@@ -3931,7 +3931,7 @@ export default {
       ejecutivos_comerciales: [],
       consulta_ejecutivo_comercial: "",
       ejecutivo_comercial: "",
-      acuerdos_comerciales: "",
+      acuerdo_comercial: "",
       consulta_jornada_laboral: "",
       jornadas_laborales: [],
       jornada_laboral: "",
@@ -4495,7 +4495,7 @@ export default {
       self.registroCliente.aiu_negociado = this.aiu_negociado;
       self.registroCliente.consulta_ejecutivo_comercial =
         this.consulta_ejecutivo_comercial;
-      self.registroCliente.acuerdos_comerciales = this.acuerdos_comerciales;
+      self.registroCliente.acuerdo_comercial = this.acuerdo_comercial;
       self.registroCliente.consulta_jornada_laboral =
         this.consulta_jornada_laboral;
       self.registroCliente.consulta_rotacion_personal =
@@ -5229,7 +5229,7 @@ export default {
           this.consulta_operacion = "";
           this.aiu_negociado = "";
           this.consulta_ejecutivo_comercial = "";
-          this.acuerdos_comerciales = "";
+          this.acuerdo_comercial = "";
           this.jornada_laboral = "";
           this.consulta_jornada_laboral = "";
           this.rotacion_personal = "";
@@ -5924,7 +5924,7 @@ export default {
       this.ejecutivos_comerciales = [];
       this.consulta_ejecutivo_comercial = "";
       this.ejecutivo_comercial = "";
-      this.acuerdos_comerciales = "";
+      this.acuerdo_comercial = "";
       this.consulta_jornada_laboral = "";
       this.jornadas_laborales = [];
       this.jornada_laboral = "";
@@ -7079,7 +7079,7 @@ export default {
         item.consulta_municipio_prestacion_servicio;
       this.aiu_negociado = item.aiu_negociado;
       this.consulta_ejecutivo_comercial = item.consulta_ejecutivo_comercial;
-      this.acuerdos_comerciales = item.acuerdos_comerciales;
+      this.acuerdo_comercial = item.acuerdo_comercial;
       this.consulta_jornada_laboral = item.consulta_jornada_laboral;
       this.consulta_rotacion_personal = item.consulta_rotacion_personal;
       this.consulta_riesgo_cliente = item.consulta_riesgo_cliente;
