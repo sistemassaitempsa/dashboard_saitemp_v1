@@ -32,6 +32,9 @@
       </div>
     </div>
     <div class="row">
+      <h2>Historico de estados</h2>
+    </div>
+    <div class="row">
       <div class="col-xs-12 col-md-12">
         <h5 class="h5paginate" v-if="!sin_registros">
           Mostrando {{ this.datos.length }} de
@@ -40,11 +43,21 @@
         </h5>
       </div>
     </div>
-    <div class="row">
-      <h2>Historico de estados</h2>
+    <div
+      v-if="datos.length > 0"
+      class="row mt-4"
+      style="text-align: left; clear: both"
+    >
+      <span @click="toggleFiltros = !toggleFiltros" style="cursor: pointer"
+        >Filtro avanzado de búsqueda
+        <i v-if="toggleFiltros" class="bi bi-chevron-down"></i
+        ><i v-if="!toggleFiltros" class="bi bi-chevron-compact-up"></i
+      ></span>
     </div>
+    <FiltrosTabla :filtros="filtros" v-if="toggleFiltros"></FiltrosTabla>
     <TablaHistoricoEstados
       :datos="filteredDatos"
+      :total_registros="total_registros"
       :columnas="columnas"
     ></TablaHistoricoEstados>
     <TablaPaginador :pagination="pagination" @navigate="getDatos" />
@@ -52,6 +65,7 @@
 </template>
 <script>
 import TablaHistoricoEstados from "./TablaHistoricoEstados.vue";
+import FiltrosTabla from "./FiltrosTabla.vue";
 import { Token } from "../Mixins/Token.js";
 import { Alerts } from "../Mixins/Alerts.js";
 import TablaPaginador from "./TablaPaginador.vue";
@@ -61,11 +75,14 @@ export default {
   components: {
     TablaHistoricoEstados,
     TablaPaginador,
+    FiltrosTabla,
   },
   mixins: [Token, Alerts],
   props: {},
   data() {
     return {
+      /* sin_registros: true, */
+      toggleFiltros: false,
       page_label: "",
       pagination: {},
       total_registros: "",
@@ -85,6 +102,15 @@ export default {
         "Fecha de finalización",
         "Tiempo(min)",
         "Oportuno",
+      ],
+      filtros: [
+        {
+          value: "Radicado",
+          label: "Radicado",
+          opciones: ["Igual a", "Contiene"],
+          type: "text",
+        },
+        {},
       ],
     };
   },

@@ -1,5 +1,27 @@
 <template>
   <div class="table-container">
+    <div class="col-xs-3 col-md-3">
+      <label
+        for="exampleFormControlInput1"
+        class="form-label"
+        style="float: left"
+        >Cantidad de registros a listar</label
+      >
+      <select
+        class="form-select form-select-sm"
+        @change="verificarConsultaFiltro()"
+        v-model="cantidad_registros"
+        aria-label="Default select example"
+      >
+        <option>10</option>
+        <option v-if="total_registros > 10">20</option>
+        <option v-if="total_registros > 50">50</option>
+        <option v-if="total_registros > 100">100</option>
+        <option v-if="total_registros > 300">200</option>
+        <option v-if="total_registros > 500">300</option>
+        <option v-if="total_registros > 1000">500</option>
+      </select>
+    </div>
     <table class="table">
       <thead>
         <tr>
@@ -35,6 +57,10 @@
 export default {
   name: "TablaHistoricoEstados",
   props: {
+    total_registros: {
+      type: String,
+      required: true,
+    },
     datos: {
       type: Array,
       required: true,
@@ -44,6 +70,14 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {};
+  },
+  methods: {
+    verificarConsultaFiltro() {
+      this.$emit("cantidadRegistros", this.cantidad_registros);
+    },
+  },
 };
 </script>
 
@@ -51,10 +85,12 @@ export default {
 .table-container {
   overflow-x: auto;
   max-width: 100%;
+  margin-top: 2em;
 }
 .table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 2em;
 }
 .table th,
 .table td {

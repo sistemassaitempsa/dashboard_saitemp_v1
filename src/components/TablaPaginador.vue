@@ -55,7 +55,7 @@ export default {
   },
   data() {
     return {
-      pagina: 1,
+      pagina: "1",
     };
   },
   methods: {
