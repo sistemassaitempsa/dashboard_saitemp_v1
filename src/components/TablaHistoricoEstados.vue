@@ -3,6 +3,7 @@
     <table class="table">
       <thead>
         <tr>
+          <th>#</th>
           <th v-for="(columna, index) in columnas" :key="index">
             {{ columna }}
           </th>
@@ -14,6 +15,9 @@
           :key="index"
           :class="{ 'bg-light-gray': index % 2 === 1 }"
         >
+          <td>
+            {{ index + 1 }}
+          </td>
           <td
             v-for="(valor, key) in dato"
             :key="key"

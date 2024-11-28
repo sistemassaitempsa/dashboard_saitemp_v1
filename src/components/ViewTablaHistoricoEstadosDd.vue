@@ -31,27 +31,43 @@
         <p>{{ porcentaje_pendientes }} %</p>
       </div>
     </div>
-    <h2>Historico de estados</h2>
+    <div class="row">
+      <div class="col-xs-12 col-md-12">
+        <h5 class="h5paginate" v-if="!sin_registros">
+          Mostrando {{ this.datos.length }} de
+          {{ this.total_registros }} registros - página
+          {{ this.page_label }}
+        </h5>
+      </div>
+    </div>
+    <div class="row">
+      <h2>Historico de estados</h2>
+    </div>
     <TablaHistoricoEstados
       :datos="filteredDatos"
       :columnas="columnas"
     ></TablaHistoricoEstados>
+    <TablaPaginador :pagination="pagination" @navigate="getDatos" />
   </div>
 </template>
 <script>
 import TablaHistoricoEstados from "./TablaHistoricoEstados.vue";
 import { Token } from "../Mixins/Token.js";
 import { Alerts } from "../Mixins/Alerts.js";
+import TablaPaginador from "./TablaPaginador.vue";
 import axios from "axios";
 export default {
   name: "",
   components: {
     TablaHistoricoEstados,
+    TablaPaginador,
   },
   mixins: [Token, Alerts],
   props: {},
   data() {
     return {
+      page_label: "",
+      pagination: {},
       total_registros: "",
       porcentaje_pendientes: "",
       porcentaje_no_oportuno: "",
@@ -95,19 +111,32 @@ export default {
       this.divExpandido = !this.divExpandido;
       this.divExpandido2 = false;
     },
-    getDatos() {
-      let self = this;
-      let config = this.configHeader();
-      axios
-        .get(self.URL_API + "api/v1/consultaHistoricoEstadosDd/" + 10, config)
-        .then((result) => {
-          self.first_page_url = result.data.first_page_url.replace('"');
-          this.datos = result.data.data;
-          this.porcentaje_oportuno = result.data.porcentaje_oportuno;
-          this.porcentaje_no_oportuno = result.data.porcentaje_no_oportuno;
-          this.porcentaje_pendientes = result.data.porcentaje_pendientes;
-          this.total_registros = result.data.total;
+    async getDatos(
+      url = `${this.URL_API}api/v1/consultaHistoricoEstadosDd/10`,
+      page = 1
+    ) {
+      try {
+        const config = this.configHeader();
+        const response = await axios.get(url, config);
+        this.datos = response.data.data || [];
+        this.total_registros = response.data.total;
+        this.page_label = page;
+        this.porcentaje_pendientes = response.data.porcentaje_pendientes;
+        this.porcentaje_no_oportuno = response.data.porcentaje_no_oportuno;
+        this.porcentaje_oportuno = response.data.porcentaje_oportuno;
+        const linksFiltered = response.data.links.filter((link) => {
+          return (
+            link.label != "Next &raquo;" && link.label != "&laquo; Previous"
+          );
         });
+        this.pagination = {
+          links: linksFiltered,
+          prev_page_url: response.data.prev_page_url,
+          next_page_url: response.data.next_page_url,
+        };
+      } catch (error) {
+        this.showAlert("Error al cargar los datos", "error");
+      }
     },
     formatearFecha(fechaISO) {
       const fecha = new Date(fechaISO);
@@ -281,7 +310,11 @@ h2 {
   overflow: hidden;
   /* Ocultar el contenido al contraer */
 }
-
+.h5paginate {
+  text-align: left;
+  color: #d06519;
+  margin-top: 2em;
+}
 /* .orientacion{
     text-align: justify;
 } */
