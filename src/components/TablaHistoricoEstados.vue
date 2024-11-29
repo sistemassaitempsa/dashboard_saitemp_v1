@@ -58,7 +58,7 @@ export default {
   name: "TablaHistoricoEstados",
   props: {
     total_registros: {
-      type: String,
+      type: Number,
       required: true,
     },
     datos: {
@@ -71,7 +71,9 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      cantidad_registros: 10,
+    };
   },
   methods: {
     verificarConsultaFiltro() {

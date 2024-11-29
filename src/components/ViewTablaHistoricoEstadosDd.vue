@@ -36,7 +36,7 @@
     </div>
     <div class="row">
       <div class="col-xs-12 col-md-12">
-        <h5 class="h5paginate" v-if="!sin_registros">
+        <h5 class="h5paginate" v-if="datos.length > 0">
           Mostrando {{ this.datos.length }} de
           {{ this.total_registros }} registros - página
           {{ this.page_label }}
@@ -54,7 +54,12 @@
         ><i v-if="!toggleFiltros" class="bi bi-chevron-compact-up"></i
       ></span>
     </div>
-    <FiltrosTabla :filtros="filtros" v-if="toggleFiltros"></FiltrosTabla>
+    <FiltrosTabla
+      @enviarFiltros="aplicarFiltro"
+      :filtros="filtros"
+      @borrarBusqueda="getDatos"
+      v-if="toggleFiltros"
+    ></FiltrosTabla>
     <TablaHistoricoEstados
       :datos="filteredDatos"
       :total_registros="total_registros"
@@ -81,11 +86,10 @@ export default {
   props: {},
   data() {
     return {
-      /* sin_registros: true, */
       toggleFiltros: false,
       page_label: "",
       pagination: {},
-      total_registros: "",
+      total_registros: 0,
       porcentaje_pendientes: "",
       porcentaje_no_oportuno: "",
       porcentaje_oportuno: "",
@@ -105,12 +109,48 @@ export default {
       ],
       filtros: [
         {
-          value: "Radicado",
+          value: "radicado",
           label: "Radicado",
           opciones: ["Igual a", "Contiene"],
           type: "text",
         },
-        {},
+        {
+          value: "responsable_inicial",
+          label: "Responsable",
+          opciones: ["Igual a", "Contiene"],
+          type: "text",
+        },
+        {
+          value: "nombre_estado",
+          label: "Estado",
+          opciones: ["Igual a", "Contiene"],
+          type: "text",
+        },
+        {
+          value: "created_at",
+          label: "Fecha creación",
+          opciones: ["Igual a", "Entre"],
+          type: "date",
+        },
+        {
+          value: "updated_at",
+          label: "Fecha finalización",
+          opciones: ["Igual a", "Entre"],
+          type: "date",
+        },
+        {
+          value: "tiempo",
+          label: "Tiempo",
+          opciones: ["Igual a", "Entre"],
+          type: "text",
+        },
+        {
+          value: "oportuno",
+          label: "Oportuno",
+          opciones: ["Igual a"],
+          type: "select",
+          opciones_select: ["Si", "No"],
+        },
       ],
     };
   },
@@ -120,8 +160,12 @@ export default {
         radicado: item.radicado,
         responsable_inicial: item.responsable_inicial,
         nombre_estado: item.nombre_estado,
-        created_at: this.formatearFecha(item.created_at),
-        updated_at: this.formatearFecha(item.updated_at),
+        created_at: item.created_at
+          ? this.formatearFecha(item.created_at)
+          : this.formatearFecha(item.estado_created_at),
+        updated_at: item.updated_at
+          ? this.formatearFecha(item.updated_at)
+          : this.formatearFecha(item.estado_updated_at),
         Tiempo: item.tiempo != 0 ? item.tiempo : "Estado pendiente",
         oportuno: this.formatearOportuno(item.oportuno),
       }));
@@ -165,14 +209,63 @@ export default {
       }
     },
     formatearFecha(fechaISO) {
-      const fecha = new Date(fechaISO);
-      return fecha.toLocaleDateString("es-Es", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-      });
+      console.log(fechaISO);
+      try {
+        // Intenta crear una fecha a partir del formato original
+        let fecha = new Date(fechaISO);
+
+        // Si la fecha es inválida, intenta reemplazar ciertos formatos problemáticos
+        if (isNaN(fecha)) {
+          // Corrige fechas con espacios o con un formato incorrecto
+          fechaISO = fechaISO.replace(" ", "T"); // Reemplaza espacio por "T" en caso de que falte
+          fecha = new Date(fechaISO);
+        }
+
+        // Si sigue siendo inválida, lanza un error
+        if (isNaN(fecha)) {
+          throw new Error("Formato de fecha no válido");
+        }
+
+        // Retorna la fecha formateada
+        return fecha.toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+        });
+      } catch (error) {
+        console.error("Error al formatear la fecha:", error.message);
+        return "Fecha no válida"; // Valor por defecto en caso de error
+      }
+    },
+    async aplicarFiltro(filtros) {
+      const url = `${this.URL_API}api/v1/consultaHistoricoEstadosDd/10`;
+      const config = this.configHeader();
+
+      try {
+        const response = await axios.post(url, { filtros }, config);
+        this.datos = response.data.data || [];
+        console.log(response.data.data);
+        this.total_registros = response.data.total;
+        this.porcentaje_pendientes = response.data.porcentaje_pendientes;
+        this.porcentaje_no_oportuno = response.data.porcentaje_no_oportuno;
+        this.porcentaje_oportuno = response.data.porcentaje_oportuno;
+        const linksFiltered = response.data.links.filter((link) => {
+          return (
+            link.label != "Next &raquo;" && link.label != "&laquo; Previous"
+          );
+        });
+        this.pagination = {
+          links: linksFiltered,
+          prev_page_url: response.data.prev_page_url,
+          next_page_url: response.data.next_page_url,
+        };
+
+        // Maneja otros datos como porcentaje, etc.
+      } catch (error) {
+        console.error("Error al aplicar filtros:", error);
+      }
     },
     formatearOportuno(oportuno) {
       switch (oportuno) {

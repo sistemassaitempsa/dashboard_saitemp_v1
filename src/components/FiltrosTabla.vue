@@ -6,16 +6,16 @@
       :key="index"
     >
       <!-- Campo -->
-      <div class="col-3">
+      <div class="col-2">
         <label for="campo" class="form-label" style="float: left">Campo</label>
         <select
           class="form-select form-select-sm"
           name="campo"
           id="campo"
           v-model="filtroDinamico.dato_seleccionado"
-          @change="actualizarComparaciones"
+          @change="actualizarComparaciones(index)"
         >
-          <option value="">Por favor seleccione un campo</option>
+          <option value="">Seleccione un campo</option>
           <option
             v-for="(filtro, index) in filtros"
             :value="filtro.value"
@@ -26,7 +26,11 @@
         </select>
         <div class="row mt-5" v-if="index == filtrosDinamicos.length - 1">
           <div class="col">
-            <button type="button" class="btn btn-success btn-sm">
+            <button
+              type="button"
+              class="btn btn-success btn-sm"
+              @click="enviarFiltros"
+            >
               Realizar búsqueda
             </button>
           </div>
@@ -34,7 +38,7 @@
       </div>
 
       <!-- Comparación -->
-      <div class="col-3">
+      <div class="col-2">
         <label for="opciones" class="form-label" style="float: left"
           >Comparación</label
         >
@@ -44,9 +48,9 @@
           v-model="filtroDinamico.comparacion_seleccionada"
           class="form-select form-select-sm"
         >
-          <option value="">Seleccione una comparación</option>
+          <option value="">Seleccione una opción</option>
           <option
-            v-for="(opcion, index) in comparaciones"
+            v-for="(opcion, index) in filtroDinamico.comparaciones"
             :value="opcion"
             :key="index"
           >
@@ -66,21 +70,75 @@
       <div class="col-3">
         <label for="valor" class="form-label" style="float: left">Valor</label>
         <input
-          :type="type"
+          v-if="
+            filtroDinamico.comparacion_seleccionada != 'Entre' &&
+            filtroDinamico.type != 'select'
+          "
+          :type="filtroDinamico.type"
           id="valor"
           name="valor"
           v-model="filtroDinamico.valor_ingresado"
           class="form-control form-control-sm"
         />
+        <select
+          v-else-if="filtroDinamico.type == 'select'"
+          :type="filtroDinamico.type"
+          id="valor"
+          name="valor"
+          v-model="filtroDinamico.valor_ingresado"
+          class="form-control form-control-sm"
+        >
+          <option
+            v-for="(opcion, index) in filtroDinamico.opciones_select"
+            :key="index"
+            :value="opcion"
+          >
+            {{ opcion }}
+          </option>
+        </select>
+        <input
+          v-else
+          :type="filtroDinamico.type"
+          id="valor"
+          name="valor"
+          v-model="filtroDinamico.valor_ingresado[0]"
+          class="form-control form-control-sm"
+        />
         <div class="row mt-5" v-if="index == filtrosDinamicos.length - 1">
           <div class="col">
-            <button type="button" class="btn btn-success btn-sm">
+            <button
+              type="button"
+              class="btn btn-success btn-sm"
+              @click="eliminarBusqueda"
+            >
               Borrar búsqueda
             </button>
           </div>
         </div>
       </div>
-      <div class="col-3" v-if="index == filtrosDinamicos.length - 1">
+      <div
+        class="col-3"
+        v-if="filtroDinamico.comparacion_seleccionada == 'Entre'"
+      >
+        <label for="valor" class="form-label" style="float: left">Valor</label>
+        <input
+          v-if="filtroDinamico.comparacion_seleccionada != 'Entre'"
+          :type="filtroDinamico.type"
+          id="valor"
+          name="valor"
+          v-model="filtroDinamico.valor_ingresado"
+          class="form-control form-control-sm"
+        />
+        <input
+          v-else
+          :type="filtroDinamico.type"
+          id="valor"
+          name="valor"
+          v-model="filtroDinamico.valor_ingresado[1]"
+          class="form-control form-control-sm"
+        />
+      </div>
+      <div class="col-1" v-if="index == filtrosDinamicos.length - 1">
         <button
           type="button"
           class="btn btn-success mt-4 btn-sm"
@@ -119,7 +177,10 @@ export default {
         {
           dato_seleccionado: "",
           comparacion_seleccionada: "",
-          valor_ingresado: "",
+          valor_ingresado: "" || [],
+          comparaciones: [],
+          type: "text",
+          opciones_select: [],
         },
       ],
       filtrosSelec: JSON.parse(JSON.stringify(this.filtros)),
@@ -131,28 +192,44 @@ export default {
     };
   },
   methods: {
-    emitirFiltros() {
-      // Emitir los filtros actualizados al componente padre
-      const filtrosAplicados = this.filtrosSelec.reduce((acc, filtro) => {
-        if (filtro.valor) {
-          acc[filtro.campo] = filtro.valor;
-        }
-        return acc;
-      }, {});
-      this.$emit("aplicar-filtros", filtrosAplicados);
+    eliminarBusqueda() {
+      this.$emit("borrarBusqueda");
     },
     resetFiltros() {
       // Restablecer los valores de los filtros
       this.filtrosSelec = JSON.parse(JSON.stringify(this.filtrosIniciales));
-      this.emitirFiltros(); // Emitir los filtros restablecidos
     },
     actualizarComparaciones(index) {
-      const filtro = this.filtros.find(
-        (filtro) => filtro.value === this.campoSeleccionado
+      const filtroSeleccionado = this.filtros.find(
+        (filtro) =>
+          filtro.value === this.filtrosDinamicos[index].dato_seleccionado
       );
-      this.comparaciones = filtro ? filtro.opciones : [];
-      this.filtrosDinamicos[index].comparacion_seleccionada = ""; // Reiniciar la comparación al cambiar el campo
-      this.type = filtro ? filtro.type : "text";
+
+      if (filtroSeleccionado) {
+        // Asigna las comparaciones y el tipo del filtro seleccionado
+        this.$set(
+          this.filtrosDinamicos[index],
+          "comparaciones",
+          filtroSeleccionado.opciones || []
+        );
+        this.$set(
+          this.filtrosDinamicos[index],
+          "opciones_select",
+          filtroSeleccionado.opciones_select || []
+        );
+        this.$set(
+          this.filtrosDinamicos[index],
+          "type",
+          filtroSeleccionado.type || "text"
+        );
+      } else {
+        // Restablece comparaciones y tipo si no se encuentra un filtro válido
+        this.$set(this.filtrosDinamicos[index], "comparaciones", []);
+        this.$set(this.filtrosDinamicos[index], "type", "text");
+      }
+
+      // Reinicia el valor de la comparación seleccionada
+      this.filtrosDinamicos[index].comparacion_seleccionada = "";
     },
     agregarFiltro() {
       this.filtrosDinamicos.push({
@@ -163,6 +240,17 @@ export default {
     },
     eliminarFiltro(index) {
       this.filtrosDinamicos.splice(index, 1);
+    },
+    enviarFiltros() {
+      const filtrosFormated = this.filtrosDinamicos.map((filtro) => {
+        filtro = {
+          campo: filtro.dato_seleccionado,
+          comparacion: filtro.comparacion_seleccionada,
+          valor: filtro.valor_ingresado,
+        };
+        return filtro;
+      });
+      this.$emit("enviarFiltros", filtrosFormated);
     },
   },
 };
