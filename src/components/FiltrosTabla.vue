@@ -59,7 +59,11 @@
         </select>
         <div class="row mt-5" v-if="index == filtrosDinamicos.length - 1">
           <div class="col">
-            <button type="button" class="btn btn-success btn-sm">
+            <button
+              type="button"
+              class="btn btn-success btn-sm"
+              @click="exportarExcel"
+            >
               Exportar excel
             </button>
           </div>
@@ -251,6 +255,17 @@ export default {
         return filtro;
       });
       this.$emit("enviarFiltros", filtrosFormated);
+    },
+    exportarExcel() {
+      const filtrosFormated = this.filtrosDinamicos.map((filtro) => {
+        filtro = {
+          campo: filtro.dato_seleccionado,
+          comparacion: filtro.comparacion_seleccionada,
+          valor: filtro.valor_ingresado,
+        };
+        return filtro;
+      });
+      this.$emit("descargarExcel", filtrosFormated);
     },
   },
 };

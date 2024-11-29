@@ -55,6 +55,7 @@
       ></span>
     </div>
     <FiltrosTabla
+      @descargarExcel="descargarExcel"
       @enviarFiltros="aplicarFiltro"
       :filtros="filtros"
       @borrarBusqueda="getDatos"
@@ -280,6 +281,29 @@ export default {
 
         default:
           break;
+      }
+    },
+    async descargarExcel(filtros) {
+      const url = `${this.URL_API}api/v1/excelHistoricoEstadosDd`;
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        responseType: "blob",
+      };
+      try {
+        const response = await axios.post(url, { filtros }, config);
+        const urlDocument = window.URL.createObjectURL(
+          new Blob([response.data])
+        );
+        const link = document.createElement("a");
+        link.href = urlDocument;
+        link.setAttribute("download", "estados.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.log(error);
       }
     },
   },
