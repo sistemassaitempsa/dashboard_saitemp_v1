@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <Loading :loading="loading" />
     <div
       @click="toggleDiv"
       :class="{
@@ -75,6 +76,7 @@ import FiltrosTabla from "./FiltrosTabla.vue";
 import { Token } from "../Mixins/Token.js";
 import { Alerts } from "../Mixins/Alerts.js";
 import TablaPaginador from "./TablaPaginador.vue";
+import Loading from "./Loading.vue";
 import axios from "axios";
 export default {
   name: "",
@@ -82,11 +84,13 @@ export default {
     TablaHistoricoEstados,
     TablaPaginador,
     FiltrosTabla,
+    Loading,
   },
   mixins: [Token, Alerts],
   props: {},
   data() {
     return {
+      loading: false,
       toggleFiltros: false,
       page_label: "",
       pagination: {},
@@ -186,6 +190,7 @@ export default {
       url = `${this.URL_API}api/v1/consultaHistoricoEstadosDd/10`,
       page = 1
     ) {
+      this.loading = true;
       try {
         const config = this.configHeader();
         const response = await axios.get(url, config);
@@ -205,8 +210,10 @@ export default {
           prev_page_url: response.data.prev_page_url,
           next_page_url: response.data.next_page_url,
         };
+        this.loading = false;
       } catch (error) {
         this.showAlert("Error al cargar los datos", "error");
+        this.loading = false;
       }
     },
     formatearFecha(fechaISO) {
@@ -245,6 +252,7 @@ export default {
       const config = this.configHeader();
 
       try {
+        this.loading = true;
         const response = await axios.post(url, { filtros }, config);
         this.datos = response.data.data || [];
         console.log(response.data.data);
@@ -264,8 +272,10 @@ export default {
         };
 
         // Maneja otros datos como porcentaje, etc.
+        this.loading = false;
       } catch (error) {
         console.error("Error al aplicar filtros:", error);
+        this.loading = false;
       }
     },
     formatearOportuno(oportuno) {
@@ -292,6 +302,7 @@ export default {
         responseType: "blob",
       };
       try {
+        this.loading = true;
         const response = await axios.post(url, { filtros }, config);
         const urlDocument = window.URL.createObjectURL(
           new Blob([response.data])
@@ -302,8 +313,10 @@ export default {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        this.loading = false;
       } catch (error) {
         console.log(error);
+        this.loading = false;
       }
     },
   },
