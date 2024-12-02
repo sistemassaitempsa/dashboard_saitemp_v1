@@ -59,15 +59,19 @@
       @descargarExcel="descargarExcel"
       @enviarFiltros="aplicarFiltro"
       :filtros="filtros"
-      @borrarBusqueda="getDatos"
+      @borrarBusqueda="aplicarFiltro"
       v-if="toggleFiltros"
     ></FiltrosTabla>
     <TablaHistoricoEstados
       :datos="filteredDatos"
       :total_registros="total_registros"
       :columnas="columnas"
+      @cantidadRegistros="cantidadRegistrosLista"
     ></TablaHistoricoEstados>
-    <TablaPaginador :pagination="pagination" @navigate="getDatos" />
+    <TablaPaginador
+      :pagination="pagination"
+      @navigate="(url, page_label) => getDatos(url, page_label)"
+    />
   </div>
 </template>
 <script>
@@ -191,20 +195,30 @@ export default {
       page = 1
     ) {
       this.loading = true;
+
       try {
         const config = this.configHeader();
-        const response = await axios.get(url, config);
+
+        // Incluye los filtros actuales
+        const filtros = this.filtrosAplicados || [];
+
+        // Realiza la solicitud POST con filtros y URL
+        const response = await axios.post(url, { filtros }, config);
+
         this.datos = response.data.data || [];
         this.total_registros = response.data.total;
         this.page_label = page;
         this.porcentaje_pendientes = response.data.porcentaje_pendientes;
         this.porcentaje_no_oportuno = response.data.porcentaje_no_oportuno;
         this.porcentaje_oportuno = response.data.porcentaje_oportuno;
+
+        // Filtra los enlaces del paginador
         const linksFiltered = response.data.links.filter((link) => {
           return (
-            link.label != "Next &raquo;" && link.label != "&laquo; Previous"
+            link.label !== "Next &raquo;" && link.label !== "&laquo; Previous"
           );
         });
+
         this.pagination = {
           links: linksFiltered,
           prev_page_url: response.data.prev_page_url,
@@ -217,7 +231,6 @@ export default {
       }
     },
     formatearFecha(fechaISO) {
-      console.log(fechaISO);
       try {
         // Intenta crear una fecha a partir del formato original
         let fecha = new Date(fechaISO);
@@ -247,36 +260,14 @@ export default {
         return "Fecha no válida"; // Valor por defecto en caso de error
       }
     },
-    async aplicarFiltro(filtros) {
-      const url = `${this.URL_API}api/v1/consultaHistoricoEstadosDd/10`;
-      const config = this.configHeader();
-
-      try {
-        this.loading = true;
-        const response = await axios.post(url, { filtros }, config);
-        this.datos = response.data.data || [];
-        console.log(response.data.data);
-        this.total_registros = response.data.total;
-        this.porcentaje_pendientes = response.data.porcentaje_pendientes;
-        this.porcentaje_no_oportuno = response.data.porcentaje_no_oportuno;
-        this.porcentaje_oportuno = response.data.porcentaje_oportuno;
-        const linksFiltered = response.data.links.filter((link) => {
-          return (
-            link.label != "Next &raquo;" && link.label != "&laquo; Previous"
-          );
-        });
-        this.pagination = {
-          links: linksFiltered,
-          prev_page_url: response.data.prev_page_url,
-          next_page_url: response.data.next_page_url,
-        };
-
-        // Maneja otros datos como porcentaje, etc.
-        this.loading = false;
-      } catch (error) {
-        console.error("Error al aplicar filtros:", error);
-        this.loading = false;
-      }
+    async aplicarFiltro(filtros, cantidadRegistros = 10) {
+      this.filtrosAplicados = filtros; // Almacena los filtros aplicados
+      await this.getDatos(
+        `${this.URL_API}api/v1/consultaHistoricoEstadosDd/${cantidadRegistros}`
+      );
+    },
+    cantidadRegistrosLista(numero) {
+      this.aplicarFiltro(this.filtrosAplicados, numero);
     },
     formatearOportuno(oportuno) {
       switch (oportuno) {

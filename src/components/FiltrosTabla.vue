@@ -197,7 +197,15 @@ export default {
   },
   methods: {
     eliminarBusqueda() {
-      this.$emit("borrarBusqueda");
+      const filtrosFormated = this.filtrosDinamicos.map((filtro) => {
+        filtro = {
+          campo: "",
+          comparacion: "",
+          valor: "",
+        };
+        return filtro;
+      });
+      this.$emit("borrarBusqueda", filtrosFormated);
     },
     resetFiltros() {
       // Restablecer los valores de los filtros
@@ -211,6 +219,7 @@ export default {
 
       if (filtroSeleccionado) {
         // Asigna las comparaciones y el tipo del filtro seleccionado
+        this.$set(this.filtrosDinamicos[index], "valor_ingresado", "" || []);
         this.$set(
           this.filtrosDinamicos[index],
           "comparaciones",
@@ -229,6 +238,7 @@ export default {
       } else {
         // Restablece comparaciones y tipo si no se encuentra un filtro válido
         this.$set(this.filtrosDinamicos[index], "comparaciones", []);
+        this.$set(this.filtrosDinamicos[index], "valor_ingresado", "");
         this.$set(this.filtrosDinamicos[index], "type", "text");
       }
 

@@ -61,15 +61,15 @@ export default {
   methods: {
     irPaginaexpecifica(url, label) {
       this.pagina = label;
-      this.$emit("navigate", url, label);
+      this.$emit("navigate", url, label); // Envía URL y etiqueta de página
     },
     irSiguiente(url) {
-      this.pagina = this.pagina + 1;
-      this.$emit("navigate", url, this.pagina);
+      this.pagina += 1;
+      this.$emit("navigate", url, this.pagina); // Envía URL y nueva página
     },
     irAtras(url) {
-      this.pagina = this.pagina - 1;
-      this.$emit("navigate", url, this.pagina);
+      this.pagina -= 1;
+      this.$emit("navigate", url, this.pagina); // Envía URL y nueva página
     },
   },
 };

@@ -3816,6 +3816,7 @@ export default {
   },
   data() {
     return {
+      tamano_texto_version: "",
       toogleModalEstadoContrato: false,
       contrato: [],
       toogleModalFirmas: false,
@@ -4280,6 +4281,7 @@ export default {
         .get(self.URL_API + "api/v1/versiondebidadiligencia", config)
         .then(function (result) {
           self.versiones = result.data;
+          self.tamano_texto_version = result.data[0].tamano_texto;
         });
     },
     validaCamposDinamicos(index, bandera = null) {
@@ -7373,6 +7375,7 @@ export default {
             }
           });
         });
+        this.consulta_observacion_estado = item.nombre_novedad_servicio;
         this.contrato = item.contrato;
         this.direccion_rut = item.dirección_rut;
         this.bloquea_campos = true;
