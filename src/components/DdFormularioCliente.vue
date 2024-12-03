@@ -5815,14 +5815,44 @@ export default {
       });
     },
     limpiarformulario() {
-      this.consulta_responsable_firma = "";
-      this.estado_firma_id = "";
-      this.consulta_estado_firma = "";
-      this.consulta_responsable = "";
-      this.responsable_id = "";
-      this.lista_responsables = [];
-      this.lista_responsables_corregir = [];
-      this.estados_firma_debida_diligencia = [];
+      this.tamano_texto_version= "";
+      this.toogleModalEstadoContrato= false;
+      this.contrato= [];
+      this.toogleModalFirmas= false;
+      this.bloquea_campos= false;
+      this.menu_id= "";
+      this.encargado_corregir_correo= "";
+      this.encargado_id_copia= "";
+      this.correoResponsable= "";
+      this.responsable_id_copia= "";
+      this.estado_firma_id_copia= "";
+      this.correosSeleccionados= {
+        correos: [],
+      };
+      this.novedad_servicio= "";
+      this.consulta_encargado_corregir= "";
+      this.encargado_id= "";
+      this.lista_encargados_corregir= [];
+      this.afectacion_servicio= "";
+      this.consulta_observacion_estado= "";
+      this.observaciones_estado= [];
+      this.direccion_rut= "";
+      this.consulta_pais_rut= "Colombia";
+      this.consulta_departamento_rut= "";
+      this.consulta_municipio_rut= "";
+      this.municipio_rut= "";
+      this.seguimiento= [];
+      this.seguimiento_estados= [];
+      this.divExpandido= false;
+      this.divExpandido2= false;
+      this.consulta_responsable_firma= "";
+      this.estado_firma_id= "";
+      this.consulta_estado_firma= "";
+      this.consulta_responsable= "";
+      this.responsable_id= "";
+      this.lista_responsables= [];
+      this.lista_responsables_corregir= [];
+      this.estados_firma_debida_diligencia= [];
       this.cargos = [{ cargo: "", requisitos: [], examenes: [], riesgo: "" }];
       this.cargos2 = [
         {

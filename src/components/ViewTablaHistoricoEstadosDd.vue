@@ -167,7 +167,7 @@ export default {
     filteredDatos() {
       return this.datos.map((item) => ({
         radicado: item.radicado,
-        responsable_inicial: item.responsable_inicial,
+        responsable_final: item.responsable_final,
         nombre_estado: item.nombre_estado,
         created_at: item.created_at
           ? this.formatearFecha(item.created_at)
