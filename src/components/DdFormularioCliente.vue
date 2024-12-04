@@ -3550,6 +3550,7 @@
               :consulta="consulta_observacion_estado"
               :valida_campo="true"
               :disabled="bloquea_campos && !permisos[26].autorizado"
+              required
             />
           </div>
           <div
@@ -5815,44 +5816,44 @@ export default {
       });
     },
     limpiarformulario() {
-      this.tamano_texto_version= "";
-      this.toogleModalEstadoContrato= false;
-      this.contrato= [];
-      this.toogleModalFirmas= false;
-      this.bloquea_campos= false;
-      this.menu_id= "";
-      this.encargado_corregir_correo= "";
-      this.encargado_id_copia= "";
-      this.correoResponsable= "";
-      this.responsable_id_copia= "";
-      this.estado_firma_id_copia= "";
-      this.correosSeleccionados= {
+      this.tamano_texto_version = "";
+      this.toogleModalEstadoContrato = false;
+      this.contrato = [];
+      this.toogleModalFirmas = false;
+      this.bloquea_campos = false;
+      this.menu_id = "";
+      this.encargado_corregir_correo = "";
+      this.encargado_id_copia = "";
+      this.correoResponsable = "";
+      this.responsable_id_copia = "";
+      this.estado_firma_id_copia = "";
+      this.correosSeleccionados = {
         correos: [],
       };
-      this.novedad_servicio= "";
-      this.consulta_encargado_corregir= "";
-      this.encargado_id= "";
-      this.lista_encargados_corregir= [];
-      this.afectacion_servicio= "";
-      this.consulta_observacion_estado= "";
-      this.observaciones_estado= [];
-      this.direccion_rut= "";
-      this.consulta_pais_rut= "Colombia";
-      this.consulta_departamento_rut= "";
-      this.consulta_municipio_rut= "";
-      this.municipio_rut= "";
-      this.seguimiento= [];
-      this.seguimiento_estados= [];
-      this.divExpandido= false;
-      this.divExpandido2= false;
-      this.consulta_responsable_firma= "";
-      this.estado_firma_id= "";
-      this.consulta_estado_firma= "";
-      this.consulta_responsable= "";
-      this.responsable_id= "";
-      this.lista_responsables= [];
-      this.lista_responsables_corregir= [];
-      this.estados_firma_debida_diligencia= [];
+      this.novedad_servicio = "";
+      this.consulta_encargado_corregir = "";
+      this.encargado_id = "";
+      this.lista_encargados_corregir = [];
+      this.afectacion_servicio = "";
+      this.consulta_observacion_estado = "";
+      this.observaciones_estado = [];
+      this.direccion_rut = "";
+      this.consulta_pais_rut = "Colombia";
+      this.consulta_departamento_rut = "";
+      this.consulta_municipio_rut = "";
+      this.municipio_rut = "";
+      this.seguimiento = [];
+      this.seguimiento_estados = [];
+      this.divExpandido = false;
+      this.divExpandido2 = false;
+      this.consulta_responsable_firma = "";
+      this.estado_firma_id = "";
+      this.consulta_estado_firma = "";
+      this.consulta_responsable = "";
+      this.responsable_id = "";
+      this.lista_responsables = [];
+      this.lista_responsables_corregir = [];
+      this.estados_firma_debida_diligencia = [];
       this.cargos = [{ cargo: "", requisitos: [], examenes: [], riesgo: "" }];
       this.cargos2 = [
         {
@@ -6301,6 +6302,7 @@ export default {
         );
         return true;
       }
+
       if (
         (this.jornada_laboral == "" && this.tipo_cliente == 1) ||
         this.jornada_laboral == undefined
@@ -6361,6 +6363,7 @@ export default {
       //     this.showAlert('Error, los siguientes archivos no fueron adjuntados. ' + mensaje_error, 'error')
       //     return true
       // }
+
       this.file.forEach(function (item) {
         if (item.size > self.limite) {
           self.showAlert(
@@ -6372,7 +6375,17 @@ export default {
           return true;
         }
       });
-
+      if (this.departamento_rut == "") {
+        this.showAlert(
+          "Error, debe diligenciar el campo Departamento RUT.",
+          "error"
+        );
+        return true;
+      }
+      if (this.direccion_rut == "") {
+        this.showAlert("Error, debe diligenciar la direccion RUT.", "error");
+        return true;
+      }
       var valida_campo = 0;
       var valida_campo_dependiente = 0;
       this.accionistas.forEach(function (item) {
@@ -6572,6 +6585,20 @@ export default {
       if (this.detalle_otros_ingresos == "") {
         this.showAlert(
           "Error, debe diligenciar el detalle de otros ingresos.",
+          "error"
+        );
+        return true;
+      }
+      if (this.novedad_servicio == "") {
+        this.showAlert(
+          "Error, debe diligenciar el campo Novedad en servicio",
+          "error"
+        );
+        return true;
+      }
+      if (this.municipio_rut == "") {
+        this.showAlert(
+          "Error, debe diligenciar el municipio del rut.",
           "error"
         );
         return true;
@@ -7406,6 +7433,7 @@ export default {
           });
         });
         this.consulta_observacion_estado = item.nombre_novedad_servicio;
+        this.novedad_servicio = item.novedad_servicio;
         this.contrato = item.contrato;
         this.direccion_rut = item.dirección_rut;
         this.bloquea_campos = true;
