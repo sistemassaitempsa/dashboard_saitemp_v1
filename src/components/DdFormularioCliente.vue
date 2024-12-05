@@ -1000,7 +1000,7 @@
           </div>
           <div class="col">
             <SearchList
-              nombreCampo="¿se require carnet corporativo con espedificaciones distintas?: *"
+              nombreCampo="¿se require carnet corporativo con especificaciones distintas?: *"
               eventoCampo="getAfirmacionNegacion"
               nombreItem="nombre"
               :registros="afirmacionNegacion"
