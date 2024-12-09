@@ -3784,8 +3784,8 @@ import Loading from "./Loading.vue";
 import { Scroll } from "../Mixins/Scroll.js";
 import { Alerts } from "../Mixins/Alerts.js";
 import { Token } from "../Mixins/Token.js";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+/* import jsPDF from "jspdf";
+import html2canvas from "html2canvas"; */
 import EditorTextoHtml from "./EditorTextoHtml.vue";
 import { Permisos } from "../Mixins/Permisos.js";
 import ConsultaContrato from "./ConsultaContrato.vue";
@@ -4811,7 +4811,16 @@ export default {
       }, "10");
     },
     generarPDF() {
-      const elemento = document.getElementById("contenedor-formulario");
+      /*  let config = this.configHeader(); */
+      if (this.$route.params.id !== undefined) {
+        const urlDescarga =
+          this.URL_API +
+          "api/v1/formulariocliente/generarpdf/" +
+          this.$route.params.id;
+        window.open(urlDescarga, "_blank");
+      }
+
+      /* const elemento = document.getElementById("contenedor-formulario");
 
       html2canvas(elemento).then((canvas) => {
         const contenidoDataURL = canvas.toDataURL("image/png");
@@ -4863,7 +4872,7 @@ export default {
         }
 
         pdf.save("archivo.pdf");
-      });
+      }); */
     },
     formatInput(value) {
       const formattedValue =
