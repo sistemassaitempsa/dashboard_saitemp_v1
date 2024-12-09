@@ -1347,6 +1347,7 @@ export default {
         "o_total_color",
         "a_color_resultado",
         "o_color_resultado",
+        "estado_firma_id",
       ], // este array contiene los nombres de las columnas queno queremos que se muestren en la tabla
       maxCaracteres: 20,
       lista_estados_id: {},
