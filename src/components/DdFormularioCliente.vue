@@ -4819,60 +4819,6 @@ export default {
           this.$route.params.id;
         window.open(urlDescarga, "_blank");
       }
-
-      /* const elemento = document.getElementById("contenedor-formulario");
-
-      html2canvas(elemento).then((canvas) => {
-        const contenidoDataURL = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "pt", "A3");
-
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const margenHorizontal = 10;
-        const imagenWidth = pdfWidth - 2 * margenHorizontal;
-        const imagenHeight = (imagenWidth * canvas.height) / canvas.width;
-
-        const contenidoHeight = elemento.offsetHeight;
-        const margenSuperior = 10;
-        const margenInferior = 10;
-        const areaImpresionHeight =
-          pdf.internal.pageSize.getHeight() - margenSuperior - margenInferior;
-
-        let contenidoRestante = contenidoHeight;
-        let paginaActual = 0;
-
-        while (contenidoRestante > 0) {
-          const alturaPagina = Math.min(areaImpresionHeight, contenidoRestante);
-          const desplazamientoVertical =
-            -(areaImpresionHeight * paginaActual) + margenSuperior;
-          pdf.addImage(
-            contenidoDataURL,
-            "PNG",
-            margenHorizontal,
-            desplazamientoVertical,
-            imagenWidth,
-            imagenHeight
-          );
-          contenidoRestante -= alturaPagina;
-
-          paginaActual++;
-
-          if (contenidoRestante > 0) {
-            pdf.addPage();
-          }
-        }
-        pdf.deletePage(paginaActual);
-        pdf.deletePage(paginaActual - 1);
-
-        // Eliminar páginas en blanco adicionales
-        const paginasTotales = pdf.internal.getNumberOfPages();
-        if (paginaActual < paginasTotales) {
-          for (let i = paginasTotales; i > paginaActual; i--) {
-            pdf.deletePage(i);
-          }
-        }
-
-        pdf.save("archivo.pdf");
-      }); */
     },
     formatInput(value) {
       const formattedValue =
