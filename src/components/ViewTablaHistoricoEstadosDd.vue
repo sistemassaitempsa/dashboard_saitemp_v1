@@ -124,7 +124,7 @@ export default {
           type: "text",
         },
         {
-          value: "responsable_inicial",
+          value: "responsable_final",
           label: "Responsable",
           opciones: ["Igual a", "Contiene"],
           type: "text",
@@ -158,7 +158,7 @@ export default {
           label: "Oportuno",
           opciones: ["Igual a"],
           type: "select",
-          opciones_select: ["Si", "No"],
+          opciones_select: ["Si", "No", "Estado pendiente"],
         },
       ],
     };

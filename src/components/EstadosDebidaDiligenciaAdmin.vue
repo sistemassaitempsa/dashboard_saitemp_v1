@@ -356,6 +356,7 @@ export default {
       this.asignar_usuarios = [];
       this.usuario = "";
       this.tiempo_respuesta_cambio = 0;
+      this.estados = [];
     },
     crearNuevoEstado() {
       this.limpiarFormulario();
