@@ -704,6 +704,7 @@
           <div class="col mb-3">
             <label class="form-label">Observaciones al servicio: </label>
             <textarea
+              maxlength="2000"
               name=""
               id="novedades"
               class="form-control"
@@ -2553,6 +2554,7 @@ h2 {
   /* Animación para expandir */
   width: 300px;
   height: 300px;
+
   /* Anchura del contenido expandido */
 }
 
