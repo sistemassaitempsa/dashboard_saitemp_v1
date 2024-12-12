@@ -102,6 +102,7 @@ export default {
       } else {
         this.item_id_ = this.item.id;
       }
+
       axios
         .get(self.URL_API + "api/v1/contrato/" + this.item_id_, config)
         .then(function (result) {
@@ -888,12 +889,18 @@ export default {
       this.seccion7();
       if (this.index == 0) {
         // Abrir el PDF en una nueva ventana
-        pdfMake.createPdf(this.docDefinition).open();
+        /*   pdfMake.createPdf(this.docDefinition).open(); */
+        if (this.$route.params.id !== undefined) {
+          const urlDescarga =
+            this.URL_API +
+            "api/v1/formulariocliente/generarContratoDD/" +
+            this.item_id;
+          window.open(urlDescarga, "_blank");
+        }
       } else if (this.index == 1) {
         // Emitir el PDF como Blob al componente padre
-        pdfMake.createPdf(this.docDefinition).getBlob((blob) => {
-          this.$emit("pdf-generated", blob);
-        });
+
+        this.$emit("pdf-generated");
       }
     },
   },

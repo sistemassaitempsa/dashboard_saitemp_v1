@@ -232,7 +232,7 @@ export default {
     close() {
       this.$emit("closeModalCorreos");
     },
-    handlePdfGenerated(blob) {
+    handlePdfGenerated() {
       this.loading = true;
       let self = this;
       let config = this.configHeader();
@@ -267,12 +267,10 @@ export default {
         firmantes: firmantes,
       };
       console.log(firmantes);
-      const formData = new FormData();
-      formData.append("file", blob, "documento.pdf");
+
       axios
-        .post(
+        .get(
           self.URL_API + "api/v1/uploadFileValidart/" + this.registro_id,
-          formData,
           config
         )
         .then((result) => {
