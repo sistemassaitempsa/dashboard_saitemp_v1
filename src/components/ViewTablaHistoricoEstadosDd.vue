@@ -66,6 +66,7 @@
       :datos="filteredDatos"
       :total_registros="total_registros"
       :columnas="columnas"
+      :linkRegistro="'/navbar/debida-diligencia/formulario-clientes/'"
       @cantidadRegistros="cantidadRegistrosLista"
     ></TablaHistoricoEstados>
     <TablaPaginador
@@ -114,6 +115,7 @@ export default {
         "Fecha creación",
         "Fecha de finalización",
         "Tiempo(min)",
+        "Tiempo estimado(min)",
         "Oportuno",
       ],
       filtros: [
@@ -176,7 +178,9 @@ export default {
           ? this.formatearFecha(item.updated_at)
           : this.formatearFecha(item.estado_updated_at),
         Tiempo: item.tiempo != 0 ? item.tiempo : "Estado pendiente",
+        tiempo_estimado: item.tiempo_estimado,
         oportuno: this.formatearOportuno(item.oportuno),
+        id: item.id,
       }));
     },
   },

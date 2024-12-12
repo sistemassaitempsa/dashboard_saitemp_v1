@@ -6544,7 +6544,7 @@ export default {
         );
         return true;
       }
-      if (this.novedad_servicio == "") {
+      if (this.novedad_servicio == "" && this.$route.params.id!=undefined) {
         this.showAlert(
           "Error, debe diligenciar el campo Novedad en servicio",
           "error"

@@ -33,7 +33,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="(dato, index) in datos"
+          v-for="(dato, index) in filteredDatos"
           :key="index"
           :class="{ 'bg-light-gray': index % 2 === 1 }"
         >
@@ -45,7 +45,18 @@
             :key="key"
             :class="{ 'text-danger': key === 'oportuno' && valor === 'No' }"
           >
-            {{ valor }}
+            <RouterLink
+              v-if="key == 'radicado'"
+              :to="`${linkRegistro}${datos[index].id}`"
+              class="link-primary"
+            >
+              {{ valor }}
+            </RouterLink>
+            <label for="" v-else>
+              {{ valor }}
+            </label>
+
+            <!--  {{ key != "id" ? valor : null }} -->
           </td>
         </tr>
       </tbody>
@@ -61,6 +72,10 @@ export default {
       type: Number,
       required: true,
     },
+    linkRegistro: {
+      type: String,
+      required: false,
+    },
     datos: {
       type: Array,
       required: true,
@@ -74,6 +89,20 @@ export default {
     return {
       cantidad_registros: 10,
     };
+  },
+  computed: {
+    filteredDatos() {
+      return this.datos.map((item) => ({
+        radicado: item.radicado,
+        responsable_final: item.responsable_final,
+        nombre_estado: item.nombre_estado,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        Tiempo: item.tiempo,
+        tiempo_estimado: item.tiempo_estimado,
+        oportuno: item.oportuno,
+      }));
+    },
   },
   methods: {
     verificarConsultaFiltro() {

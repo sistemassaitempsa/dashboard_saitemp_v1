@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <Loading :loading="loading" />
     <NotificacionesSocket />
     <h2>Debida diligencia clientes</h2>
     <Tabla
@@ -18,11 +19,13 @@
 <script>
 import axios from "axios";
 import Tabla from "./Tabla.vue";
+import Loading from "./Loading.vue";
 import { Token } from "../Mixins/Token.js";
 import { Alerts } from "../Mixins/Alerts.js";
 import NotificacionesSocket from "./NotificacionSocket.vue";
 export default {
   components: {
+    Loading,
     Tabla,
     NotificacionesSocket,
   },
@@ -32,6 +35,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       show_table: false,
       datos: [],
       endpoint: "consultaformulariocliente",
@@ -116,6 +120,7 @@ export default {
           corregir: false,
         });
       }
+      this.loading = true;
       let self = this;
       let config = this.configHeader();
       axios
@@ -135,6 +140,7 @@ export default {
           if (result.data.status == "success") {
             self.enviarCorreos(item_id, correosSeleccionados);
           }
+          self.loading = false;
         });
     },
     actualizaEstado(
@@ -144,6 +150,7 @@ export default {
       correo_responsable,
       currenturl = null
     ) {
+      this.loading = true;
       let self = this;
       let config = this.configHeader();
       let correosSeleccionados = {
@@ -173,6 +180,7 @@ export default {
           if (result.data.status == "success") {
             self.enviarCorreos(item_id, correosSeleccionados);
           }
+          self.loading = false;
         });
     },
     llenarLista() {
