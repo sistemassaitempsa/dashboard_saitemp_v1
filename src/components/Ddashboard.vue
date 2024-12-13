@@ -64,9 +64,22 @@
         </div>
       </div>
     </div>
+    <div class="row">
+      <span v-if="char2">Porcentaje radicados oportunos vs no oportunos</span>
+      <FiltrosTabla
+        @enviarFiltros="aplicarFiltro"
+        :filtros="filtros"
+        @borrarBusqueda="aplicarFiltro"
+      />
+      <div class="col">
+        <PieChart :datosPie="chartDataPie" v-if="charPie"></PieChart>
+      </div>
+    </div>
   </div>
 </template>
 <script>
+import PieChart from "./PieChart.vue";
+import FiltrosTabla from "./FiltrosTabla.vue";
 import axios from "axios";
 import GraficoCircular from "./GraficoCircular.vue";
 import GraficoBarras from "./GraficoBarras.vue";
@@ -75,13 +88,56 @@ import Loading from "./Loading.vue";
 export default {
   components: {
     GraficoCircular,
+    FiltrosTabla,
     GraficoBarras,
     Loading,
+    PieChart,
   },
   mixins: [Token],
   props: {},
   data() {
     return {
+      filtros: [
+        {
+          value: "radicado",
+          label: "Radicado",
+          opciones: ["Igual a", "Contiene"],
+          type: "text",
+        },
+        {
+          value: "responsable_final",
+          label: "Responsable",
+          opciones: ["Igual a", "Contiene"],
+          type: "text",
+        },
+        {
+          value: "nombre_estado",
+          label: "Estado",
+          opciones: ["Igual a", "Contiene"],
+          type: "text",
+        },
+        {
+          value: "created_at",
+          label: "Fecha creación",
+          opciones: ["Igual a", "Entre"],
+          type: "date",
+        },
+        {
+          value: "updated_at",
+          label: "Fecha finalización",
+          opciones: ["Igual a", "Entre"],
+          type: "date",
+        },
+        {
+          value: "tiempo",
+          label: "Tiempo",
+          opciones: ["Igual a", "Entre"],
+          type: "text",
+        },
+      ],
+      charPie: false,
+      chartDataPie: {},
+      total_registros_pie: 0,
       loadingChar1: false,
       URL_API: process.env.VUE_APP_URL_API,
       loading: false,
@@ -118,9 +174,11 @@ export default {
   watch: {},
   mounted() {
     this.allLoad();
+    this.getDatos();
   },
   created() {
     this.empleadosActivos();
+    this.getDatos();
     //   this.empleadosActivos()
   },
   methods: {
@@ -237,6 +295,54 @@ export default {
         index += size;
       }
       return chunkedArray;
+    },
+    async getDatos(
+      url = `${this.URL_API}api/v1/consultaHistoricoEstadosDd/10`,
+      page = 1
+    ) {
+      this.loading = true;
+      this.charPie = false;
+      try {
+        const config = this.configHeader();
+
+        // Incluye los filtros actuales
+        const filtros = this.filtrosAplicados || [];
+
+        // Realiza la solicitud POST con filtros y URL
+        const response = await axios.post(url, { filtros }, config);
+
+        this.total_registros_pie = response.data.total;
+        this.page_label = page;
+        this.chartDataPie = {
+          labels: [
+            `Oportuno: ${response.data.porcentaje_oportuno}%`,
+            `No Oportuno: ${response.data.porcentaje_no_oportuno}%`,
+            `Pendiente: ${response.data.porcentaje_pendientes}%`,
+          ],
+          datasets: [
+            {
+              backgroundColor: ["#58b176", "#f76567", "#f3df86"],
+              data: [
+                response.data.porcentaje_oportuno,
+                response.data.porcentaje_no_oportuno,
+                response.data.porcentaje_pendientes,
+              ],
+            },
+          ],
+        };
+        this.charPie = true;
+        /*    this.porcentaje_pendientes = response.data.porcentaje_pendientes;
+        this.porcentaje_no_oportuno = response.data.porcentaje_no_oportuno;
+        this.porcentaje_oportuno = response.data.porcentaje_oportuno; */
+      } catch {
+        console.log("no fue posible obtener comunicacion con el servidor");
+      }
+    },
+    async aplicarFiltro(filtros, cantidadRegistros = 10) {
+      this.filtrosAplicados = filtros; // Almacena los filtros aplicados
+      await this.getDatos(
+        `${this.URL_API}api/v1/consultaHistoricoEstadosDd/${cantidadRegistros}`
+      );
     },
     empleadosActivos() {
       let self = this;
