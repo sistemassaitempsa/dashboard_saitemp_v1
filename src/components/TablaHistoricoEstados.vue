@@ -48,7 +48,7 @@
             <RouterLink
               v-if="key == 'radicado'"
               :to="`${linkRegistro}${datos[index].id}`"
-              class="link-primary"
+              class="link-offset-2 link-underline link-underline-opacity-0"
             >
               {{ valor }}
             </RouterLink>
@@ -113,6 +113,13 @@ export default {
 </script>
 
 <style scoped>
+a {
+  text-decoration: none;
+  color: #125379;
+}
+a:hover {
+  color: rgb(28, 102, 57);
+}
 .table-container {
   overflow-x: auto;
   max-width: 100%;
