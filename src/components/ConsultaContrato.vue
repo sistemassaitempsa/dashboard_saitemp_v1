@@ -890,13 +890,12 @@ export default {
       if (this.index == 0) {
         // Abrir el PDF en una nueva ventana
         /*   pdfMake.createPdf(this.docDefinition).open(); */
-        if (this.$route.params.id !== undefined) {
-          const urlDescarga =
-            this.URL_API +
-            "api/v1/formulariocliente/generarContratoDD/" +
-            this.item_id;
-          window.open(urlDescarga, "_blank");
-        }
+
+        const urlDescarga =
+          this.URL_API +
+          "api/v1/formulariocliente/generarContratoDD/" +
+          this.item_id;
+        window.open(urlDescarga, "_blank");
       } else if (this.index == 1) {
         // Emitir el PDF como Blob al componente padre
 

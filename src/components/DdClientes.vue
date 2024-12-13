@@ -81,6 +81,12 @@ export default {
           calculado: "false",
         },
         {
+          nombre: "Estado Contrato",
+          orden: "DESC",
+          tipo: "texto",
+          calculado: "false",
+        },
+        {
           nombre: "Estado contrato",
           orden: "DESC",
           tipo: "texto",

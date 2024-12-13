@@ -954,7 +954,7 @@
               "
             >
               <!-- <button type="button" class="btn btn-success btn-sm " @click="$refs.consultaContrato.consulta()"> -->
-              <ConsultaContrato :item="item" />
+              <ConsultaContrato :item_id="item.id" :item="item" />
               <!-- </button> -->
             </td>
             <td v-if="ruta == '/navbar/debida-diligencia/clientes'">

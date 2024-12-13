@@ -98,7 +98,7 @@ export default {
         nombre_estado: item.nombre_estado,
         created_at: item.created_at,
         updated_at: item.updated_at,
-        Tiempo: item.tiempo,
+        Tiempo: item.Tiempo,
         tiempo_estimado: item.tiempo_estimado,
         oportuno: item.oportuno,
       }));

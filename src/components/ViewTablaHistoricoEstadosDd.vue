@@ -177,7 +177,7 @@ export default {
         updated_at: item.updated_at
           ? this.formatearFecha(item.updated_at)
           : this.formatearFecha(item.estado_updated_at),
-        Tiempo: item.tiempo != 0 ? item.tiempo : "Estado pendiente",
+        Tiempo: item.tiempo,
         tiempo_estimado: item.tiempo_estimado,
         oportuno: this.formatearOportuno(item.oportuno),
         id: item.id,

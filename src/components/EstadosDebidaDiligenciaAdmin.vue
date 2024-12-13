@@ -348,7 +348,7 @@ export default {
         });
     },
     limpiarFormulario() {
-      this.id = "";
+      this.id_estado = "";
       this.nombre = "";
       this.color = "#9EAEAC";
       this.tiempo_respuesta = 0;
