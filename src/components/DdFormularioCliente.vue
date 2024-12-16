@@ -3759,6 +3759,41 @@
         </div>
       </div>
     </form>
+    <div
+      class="row"
+      v-if="novedades.length > 0"
+      style="text-align: left; clear: both; margin-bottom: 40px"
+    >
+      <h5 @click="novedadesToggle = !novedadesToggle" style="cursor: pointer">
+        Historico de novedades
+        <i v-if="novedadesToggle" class="bi bi-chevron-compact-up"></i
+        ><i v-if="!novedadesToggle" class="bi bi-chevron-down"></i>
+      </h5>
+    </div>
+    <div class="table-responsive" v-if="!novedadesToggle">
+      <table
+        class="table table-striped table-hover table-bordered align-middle"
+      >
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Observaciones</th>
+            <th scope="col">Usuario que guardó la novedad</th>
+            <th scope="col">Usuario que corrige</th>
+            <th scope="col">Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in novedades" :key="index">
+            <th scope="row">{{ index }}</th>
+            <td>{{ item.observaciones }}</td>
+            <td>{{ item.usuario_guarda }}</td>
+            <td>{{ item.nombre_usuario_corrige }}</td>
+            <td>{{ reformatearFechaSinHora(item.created_at) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div v-if="toogleModalFirmas">
       <ModalCorreos
         :representante_legal="representantes_legales[0]"
@@ -3817,6 +3852,8 @@ export default {
   },
   data() {
     return {
+      novedadesToggle: false,
+      novedades: [],
       tamano_texto_version: "",
       toogleModalEstadoContrato: false,
       contrato: [],
@@ -5771,6 +5808,7 @@ export default {
       });
     },
     limpiarformulario() {
+      this.novedades = [];
       this.tamano_texto_version = "";
       this.toogleModalEstadoContrato = false;
       this.contrato = [];
@@ -6544,7 +6582,7 @@ export default {
         );
         return true;
       }
-      if (this.novedad_servicio == "" && this.$route.params.id!=undefined) {
+      if (this.novedad_servicio == "" && this.$route.params.id != undefined) {
         this.showAlert(
           "Error, debe diligenciar el campo Novedad en servicio",
           "error"
@@ -7015,6 +7053,16 @@ export default {
       const horaFormateada = `${horas}:${minutos}:${segundos}`;
       return fechaFormateada + " " + horaFormateada;
     },
+    reformatearFechaSinHora(fechaOriginal) {
+      const fechaHora = new Date(fechaOriginal);
+      const año = fechaHora.getFullYear();
+      const mes = (fechaHora.getMonth() + 1).toString().padStart(2, "0"); // Los meses son indexados desde 0
+      const dia = fechaHora.getDate().toString().padStart(2, "0");
+
+      const fechaFormateada = `${dia}/${mes}/${año}  `;
+
+      return fechaFormateada;
+    },
     openModalFirmas() {
       this.toogleModalFirmas = true;
     },
@@ -7387,14 +7435,15 @@ export default {
             }
           });
         });
-        this.consulta_observacion_estado = item.nombre_novedad_servicio;
-        this.novedad_servicio = item.novedad_servicio;
+        this.novedades = item.novedades;
+        /* this.consulta_observacion_estado = item.nombre_novedad_servicio;
+        this.novedad_servicio = item.novedad_servicio; */
         this.contrato = item.contrato;
         this.direccion_rut = item.dirección_rut;
         this.bloquea_campos = true;
-        this.consulta_encargado_corregir = item.nombre_usuario_corregir;
-        this.afectacion_servicio = item.afectacion_servicio;
-        this.encargado_id = item.usuario_corregir_id;
+        /*   this.consulta_encargado_corregir = item.nombre_usuario_corregir; */
+        /*    this.afectacion_servicio = item.afectacion_servicio; */
+        /*     this.encargado_id = item.usuario_corregir_id; */
         this.encargado_id_copia = item.usuario_corregir_id;
         this.estado_firma_id_copia = item.estado_firma_id;
         this.consulta_departamento_rut = item.departamento_rut;
@@ -7797,6 +7846,7 @@ export default {
         console.log(error);
       }
     },
+
     toggleDiv() {
       this.divExpandido = !this.divExpandido;
       this.divExpandido2 = false;
