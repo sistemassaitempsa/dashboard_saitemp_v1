@@ -57,15 +57,6 @@ export default {
   },
   data() {
     return {
-      chartData: {
-        labels: ["Oportuno", "No Oportuno", "Pendiente"],
-        datasets: [
-          {
-            backgroundColor: ["#58b176", "#f76567", "#f3df86"],
-            data: [14 / 100, 11 / 100, 2 / 100],
-          },
-        ],
-      },
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false,

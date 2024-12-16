@@ -657,23 +657,6 @@
               placeholder="Seleccione una opción"
             />
           </div>
-          <div class="col mb-3">
-            <label class="form-label"
-              >Observaciones a acuerdos comerciales:
-            </label>
-            <textarea
-              name=""
-              id="acuerdos_comerciales"
-              class="form-control"
-              rows="1"
-              v-model="acuerdo_comercial"
-              @input="
-                acuerdo_comercial = formatInputUpperCase($event.target.value)
-              "
-            ></textarea>
-          </div>
-        </div>
-        <div class="row" v-if="tipo_cliente == 1">
           <div class="col">
             <SearchList
               nombreCampo="Jornada Laboral: *"
@@ -685,6 +668,8 @@
               placeholder="Seleccione una opción"
             />
           </div>
+        </div>
+        <div class="row" v-if="tipo_cliente == 1">
           <div class="col">
             <SearchList
               nombreCampo="Rotación de personal: *"
@@ -710,8 +695,6 @@
               placeholder="Seleccionar"
             />
           </div>
-        </div>
-        <div class="row" v-if="tipo_cliente == 1">
           <div class="col-4">
             <SearchList
               nombreCampo="¿Es empresa del exterior radicada en colombia?: *"
@@ -725,6 +708,8 @@
               placeholder="Seleccionar"
             />
           </div>
+        </div>
+        <div class="row" v-if="tipo_cliente == 1">
           <div class="col-4">
             <SearchList
               nombreCampo="¿Tiene vinculos con alguna empresa activa en saitemp?: *"
@@ -762,8 +747,6 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="row" v-if="tipo_cliente == 1">
           <div class="col-4">
             <SearchList
               nombreCampo="¿Actualmente tienen personal vinculado con empresa temporal?: *"
@@ -777,6 +760,8 @@
               placeholder="Seleccionar"
             />
           </div>
+        </div>
+        <div class="row" v-if="tipo_cliente == 1">
           <div class="col-4">
             <SearchList
               nombreCampo="¿Se realizó la visita presencial a las instalaciones del cliente?: *"
@@ -789,6 +774,24 @@
               @setAfirmacionNegacion="setAfirmacionNegacion"
               placeholder="Seleccionar"
             />
+          </div>
+        </div>
+        <div class="row">
+          <label class="form-label"
+            >Observaciones a acuerdos comerciales:</label
+          >
+          <div class="col mb-3">
+            <textarea
+              name=""
+              id="acuerdos_comerciales"
+              class="form-control"
+              maxlength="400"
+              rows="4"
+              v-model="acuerdo_comercial"
+              @input="
+                acuerdo_comercial = formatInputUpperCase($event.target.value)
+              "
+            ></textarea>
           </div>
         </div>
       </div>
@@ -3769,31 +3772,32 @@
         <i v-if="novedadesToggle" class="bi bi-chevron-compact-up"></i
         ><i v-if="!novedadesToggle" class="bi bi-chevron-down"></i>
       </h5>
+      <div class="table-responsive" v-if="!novedadesToggle">
+        <table
+          class="table table-striped table-hover table-bordered align-middle"
+        >
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Observaciones</th>
+              <th scope="col">Usuario que guardó la novedad</th>
+              <th scope="col">Usuario que corrige</th>
+              <th scope="col">Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in novedades" :key="index">
+              <th scope="row">{{ index }}</th>
+              <td>{{ item.observaciones }}</td>
+              <td>{{ item.usuario_guarda }}</td>
+              <td>{{ item.nombre_usuario_corrige }}</td>
+              <td>{{ reformatearFechaSinHora(item.created_at) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="table-responsive" v-if="!novedadesToggle">
-      <table
-        class="table table-striped table-hover table-bordered align-middle"
-      >
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Observaciones</th>
-            <th scope="col">Usuario que guardó la novedad</th>
-            <th scope="col">Usuario que corrige</th>
-            <th scope="col">Fecha</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in novedades" :key="index">
-            <th scope="row">{{ index }}</th>
-            <td>{{ item.observaciones }}</td>
-            <td>{{ item.usuario_guarda }}</td>
-            <td>{{ item.nombre_usuario_corrige }}</td>
-            <td>{{ reformatearFechaSinHora(item.created_at) }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+
     <div v-if="toogleModalFirmas">
       <ModalCorreos
         :representante_legal="representantes_legales[0]"
@@ -3852,7 +3856,7 @@ export default {
   },
   data() {
     return {
-      novedadesToggle: false,
+      novedadesToggle: true,
       novedades: [],
       tamano_texto_version: "",
       toogleModalEstadoContrato: false,
