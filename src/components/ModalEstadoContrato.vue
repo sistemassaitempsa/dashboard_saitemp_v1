@@ -174,6 +174,7 @@
           </div>
           <div class="col">
             <button
+              @click="verContratoHandle"
               class="btn btn-success btn-sm"
               v-if="
                 contrato.ruta_contrato != '' && contrato.ruta_contrato != null
@@ -262,7 +263,10 @@ export default {
     close() {
       this.$emit("closeModalEstadoContrato");
     },
-
+    verContratoHandle() {
+      const url = `${this.URL_API}api/v1/verContratoDD/${this.contrato.transaccion_id}`;
+      window.open(url, "_blank");
+    },
     reenviarContratoController() {
       let self = this;
       let config = this.configHeader();
@@ -292,7 +296,7 @@ export default {
           this.loading = false;
           if (result.data.status == "success") {
             this.firmado_cliente_com = result.data.contrato.firmado_cliente;
-            this.firmado_empresa_com = result.data.contato.firmado_empresa;
+            this.firmado_empresa_com = result.data.contrato.firmado_empresa;
           }
         });
     },

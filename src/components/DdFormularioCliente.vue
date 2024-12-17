@@ -4841,7 +4841,6 @@ export default {
       y = x % 11;
 
       this.digito_verificacion = y > 1 ? 11 - y : y;
-      console.log("");
     },
     hideBottons() {
       var self = this;
@@ -6989,6 +6988,7 @@ export default {
       this.registroCliente.tipos_contratos_agregados =
         this.tipos_contratos_agregados;
     },
+
     consultaFormulario(id) {
       let self = this;
       let config = this.configHeader();
@@ -6999,6 +6999,37 @@ export default {
             self.getTipoArchivo(result.data.tipo_cliente_id, result.data);
           } else {
             self.getTipoArchivo(result.data.tipo_proveedor_id, result.data);
+          }
+          console.log(result.data.contrato.transaccion_id);
+          if (
+            result.data.contrato.length > 0 &&
+            !result.data.contrato[0].ruta_contrato &&
+            result.data.contrato[0].transaccion_id != null
+          ) {
+            axios
+              .get(
+                self.URL_API +
+                  "api/v1/consultaProcesoFirma/" +
+                  result.data.contrato[0].transaccion_id,
+                config
+              )
+              .then(() => {
+                axios
+                  .get(self.URL_API + "api/v1/formulariocliente/" + id, config)
+                  .then(function (result) {
+                    if (result.data.tipo_cliente_id == 1) {
+                      self.getTipoArchivo(
+                        result.data.tipo_cliente_id,
+                        result.data
+                      );
+                    } else {
+                      self.getTipoArchivo(
+                        result.data.tipo_proveedor_id,
+                        result.data
+                      );
+                    }
+                  });
+              });
           }
           // self.llenarFormulario(result.data)
           document.body.style.overflow = "auto";
@@ -7423,7 +7454,6 @@ export default {
           item.opciones.forEach((element) => {
             if (element.url == ruta) {
               self.menu_id = element.id;
-              console.log(element.id);
             }
           });
         });
