@@ -66,30 +66,73 @@
     </div>
     <div class="row">
       <span v-if="char2">Porcentaje radicados oportunos vs no oportunos</span>
+
       <FiltrosTabla
         @enviarFiltros="aplicarFiltro"
         :filtros="filtros"
         @borrarBusqueda="aplicarFiltro"
+        @descargarExcel="descargarExcel"
       />
+
       <div class="col">
-        <PieChart :datosPie="chartDataPie" v-if="charPie"></PieChart>
+        <div class="minHeight">
+          <PieChart :datosPie="chartDataPie" v-if="charPie"></PieChart>
+        </div>
+      </div>
+      <div
+        class="row"
+        style="text-align: left; clear: both; margin-bottom: 40px"
+      >
+        <h5 @click="historicoToggle = !historicoToggle" style="cursor: pointer">
+          Detalle historico de estados
+          <i v-if="historicoToggle" class="bi bi-chevron-compact-up"></i
+          ><i v-if="!historicoToggle" class="bi bi-chevron-down"></i>
+        </h5>
+        <div v-if="!historicoToggle">
+          <div class="row">
+            <div class="col-xs-12 col-md-12">
+              <h5 class="h5paginate" v-if="datos.length > 0">
+                Mostrando {{ this.datos.length }} de
+                {{ this.total_registros_pie }} registros - página
+                {{ this.page_label }}
+              </h5>
+            </div>
+          </div>
+          <div class="col">
+            <TablaHistoricoEstados
+              :datos="filteredDatos"
+              :total_registros="total_registros_pie"
+              :columnas="columnas"
+              :linkRegistro="'/navbar/debida-diligencia/formulario-clientes/'"
+              @cantidadRegistros="cantidadRegistrosLista"
+            ></TablaHistoricoEstados>
+            <TablaPaginador
+              :pagination="pagination"
+              @navigate="(url, page_label) => getDatos(url, page_label)"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 <script>
 import PieChart from "./PieChart.vue";
+import TablaHistoricoEstados from "./TablaHistoricoEstados.vue";
 import FiltrosTabla from "./FiltrosTabla.vue";
 import axios from "axios";
 import GraficoCircular from "./GraficoCircular.vue";
 import GraficoBarras from "./GraficoBarras.vue";
 import { Token } from "../Mixins/Token.js";
 import Loading from "./Loading.vue";
+import TablaPaginador from "./TablaPaginador.vue";
 export default {
   components: {
     GraficoCircular,
     FiltrosTabla,
     GraficoBarras,
+    TablaHistoricoEstados,
+    TablaPaginador,
     Loading,
     PieChart,
   },
@@ -97,6 +140,20 @@ export default {
   props: {},
   data() {
     return {
+      datos: [],
+      columnas: [
+        "Radicado",
+        "Responsable",
+        "Estado",
+        "Fecha creación",
+        "Fecha de finalización",
+        "Tiempo(min)",
+        "Tiempo estimado(min)",
+        "Oportuno",
+      ],
+      page_label: "",
+      pagination: {},
+      historicoToggle: true,
       filtros: [
         {
           value: "radicado",
@@ -107,14 +164,16 @@ export default {
         {
           value: "responsable_final",
           label: "Responsable",
-          opciones: ["Igual a", "Contiene"],
-          type: "text",
+          opciones: ["Contiene"],
+          type: "select",
+          opciones_select: [],
         },
         {
           value: "nombre_estado",
           label: "Estado",
-          opciones: ["Igual a", "Contiene"],
-          type: "text",
+          opciones: ["Igual a"],
+          type: "select",
+          opciones_select: [],
         },
         {
           value: "created_at",
@@ -134,9 +193,17 @@ export default {
           opciones: ["Igual a", "Entre"],
           type: "text",
         },
+        {
+          value: "oportuno",
+          label: "Oportuno",
+          opciones: ["Igual a"],
+          type: "select",
+          opciones_select: ["Si", "No", "Estado pendiente"],
+        },
       ],
       charPie: false,
       chartDataPie: {},
+      total_registros: 0,
       total_registros_pie: 0,
       loadingChar1: false,
       URL_API: process.env.VUE_APP_URL_API,
@@ -170,15 +237,33 @@ export default {
     rows() {
       return this.chunk(this.items, 3);
     },
+    filteredDatos() {
+      return this.datos.map((item) => ({
+        radicado: item.radicado,
+        responsable_final: item.responsable_final,
+        nombre_estado: item.nombre_estado,
+        created_at: item.created_at
+          ? this.formatearFecha(item.created_at)
+          : this.formatearFecha(item.estado_created_at),
+        updated_at: item.updated_at
+          ? this.formatearFecha(item.updated_at)
+          : this.formatearFecha(item.estado_updated_at),
+        Tiempo: item.tiempo,
+        tiempo_estimado: item.tiempo_estimado,
+        oportuno: this.formatearOportuno(item.oportuno),
+        id: item.id,
+      }));
+    },
   },
   watch: {},
   mounted() {
     this.allLoad();
-    this.getDatos();
   },
   created() {
     this.empleadosActivos();
     this.getDatos();
+    this.getEstados();
+    this.getResponsables();
     //   this.empleadosActivos()
   },
   methods: {
@@ -208,6 +293,9 @@ export default {
           });
           self.cantidad_oportunos = JSON.stringify(array);
         });
+    },
+    cantidadRegistrosLista(numero) {
+      this.aplicarFiltro(this.filtrosAplicados, numero);
     },
     getCantidadVacantesesTipoServicio(anio = null) {
       const fechaActual = new Date();
@@ -304,13 +392,9 @@ export default {
       this.charPie = false;
       try {
         const config = this.configHeader();
-
-        // Incluye los filtros actuales
         const filtros = this.filtrosAplicados || [];
-
-        // Realiza la solicitud POST con filtros y URL
         const response = await axios.post(url, { filtros }, config);
-
+        this.datos = response.data.data || [];
         this.total_registros_pie = response.data.total;
         this.page_label = page;
         this.chartDataPie = {
@@ -334,8 +418,21 @@ export default {
         /*    this.porcentaje_pendientes = response.data.porcentaje_pendientes;
         this.porcentaje_no_oportuno = response.data.porcentaje_no_oportuno;
         this.porcentaje_oportuno = response.data.porcentaje_oportuno; */
+        const linksFiltered = response.data.links.filter((link) => {
+          return (
+            link.label !== "Next &raquo;" && link.label !== "&laquo; Previous"
+          );
+        });
+
+        this.pagination = {
+          links: linksFiltered,
+          prev_page_url: response.data.prev_page_url,
+          next_page_url: response.data.next_page_url,
+        };
+        this.loading = false;
       } catch {
-        console.log("no fue posible obtener comunicacion con el servidor");
+        this.showAlert("Error al cargar los datos", "error");
+        this.loading = false;
       }
     },
     async aplicarFiltro(filtros, cantidadRegistros = 10) {
@@ -353,6 +450,100 @@ export default {
           self.items.push({
             percentaje: result.data,
             label: "Clientes registrados",
+          });
+        });
+    },
+    formatearOportuno(oportuno) {
+      switch (oportuno) {
+        case "1":
+          return "Si";
+
+        case "0":
+          return "No";
+
+        case "2":
+          return "Estado pendiente";
+
+        default:
+          break;
+      }
+    },
+    formatearFecha(fechaISO) {
+      try {
+        // Intenta crear una fecha a partir del formato original
+        let fecha = new Date(fechaISO);
+
+        // Si la fecha es inválida, intenta reemplazar ciertos formatos problemáticos
+        if (isNaN(fecha)) {
+          // Corrige fechas con espacios o con un formato incorrecto
+          fechaISO = fechaISO.replace(" ", "T"); // Reemplaza espacio por "T" en caso de que falte
+          fecha = new Date(fechaISO);
+        }
+
+        // Si sigue siendo inválida, lanza un error
+        if (isNaN(fecha)) {
+          throw new Error("Formato de fecha no válido");
+        }
+
+        // Retorna la fecha formateada
+        return fecha.toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+        });
+      } catch (error) {
+        console.error("Error al formatear la fecha:", error.message);
+        return "Fecha no válida"; // Valor por defecto en caso de error
+      }
+    },
+    async descargarExcel(filtros) {
+      const url = `${this.URL_API}api/v1/excelHistoricoEstadosDd`;
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        responseType: "blob",
+      };
+      try {
+        this.loading = true;
+        const response = await axios.post(url, { filtros }, config);
+        const urlDocument = window.URL.createObjectURL(
+          new Blob([response.data])
+        );
+        const link = document.createElement("a");
+        link.href = urlDocument;
+        link.setAttribute("download", "estados.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        this.loading = false;
+      } catch (error) {
+        console.log(error);
+        this.loading = false;
+      }
+    },
+    getResponsables() {
+      let self = this;
+      let config = this.configHeader();
+      axios
+        .get(self.URL_API + "api/v1/allUsers", config)
+        .then(function (result) {
+          result.data.forEach((element) => {
+            self.filtros[1].opciones_select.push(element.nombre);
+          });
+        });
+    },
+    getEstados() {
+      let self = this;
+      let config = this.configHeader();
+
+      axios
+        .get(self.URL_API + "api/v1/estadosfirma", config)
+        .then(function (result) {
+          result.data.forEach((element) => {
+            self.filtros[2].opciones_select.push(element.nombre);
           });
         });
     },
@@ -426,6 +617,10 @@ span {
   display: block;
   padding: 15px;
   /* transition-duration: 500ms; */
+}
+.minHeight {
+  height: 300px;
+  min-height: 3em;
 }
 /* fin spinner*/
 </style>

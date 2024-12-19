@@ -4276,7 +4276,7 @@ export default {
     window.removeEventListener("keydown", this.convinacionGuardado);
     window.removeEventListener("keydown", this.convinacionAutoRelleno);
   },
-  created() {
+  async created() {
     // const urlCompleta = window.location.href;
     this.getModulo();
     this.urlExterna();
@@ -4296,7 +4296,7 @@ export default {
     ) {
       this.loading = true;
       this.scrollTop(true);
-      this.consultaFormulario(this.$route.params.id);
+      await this.consultaFormulario(this.$route.params.id);
     }
     this.getRiesgosLaborales();
     this.getCategoriaCargo();
@@ -6989,53 +6989,46 @@ export default {
         this.tipos_contratos_agregados;
     },
 
-    consultaFormulario(id) {
-      let self = this;
-      let config = this.configHeader();
-      axios
-        .get(self.URL_API + "api/v1/formulariocliente/" + id, config)
-        .then(function (result) {
-          if (result.data.tipo_cliente_id == 1) {
-            self.getTipoArchivo(result.data.tipo_cliente_id, result.data);
-          } else {
-            self.getTipoArchivo(result.data.tipo_proveedor_id, result.data);
-          }
-          console.log(result.data.contrato.transaccion_id);
-          if (
-            result.data.contrato.length > 0 &&
-            !result.data.contrato[0].ruta_contrato &&
-            result.data.contrato[0].transaccion_id != null
-          ) {
-            axios
-              .get(
-                self.URL_API +
-                  "api/v1/consultaProcesoFirma/" +
-                  result.data.contrato[0].transaccion_id,
-                config
-              )
-              .then(() => {
-                axios
-                  .get(self.URL_API + "api/v1/formulariocliente/" + id, config)
-                  .then(function (result) {
-                    if (result.data.tipo_cliente_id == 1) {
-                      self.getTipoArchivo(
-                        result.data.tipo_cliente_id,
-                        result.data
-                      );
-                    } else {
-                      self.getTipoArchivo(
-                        result.data.tipo_proveedor_id,
-                        result.data
-                      );
-                    }
-                  });
-              });
-          }
-          // self.llenarFormulario(result.data)
-          document.body.style.overflow = "auto";
-        });
-    },
+    async consultaFormulario(id) {
+      const config = this.configHeader();
+      const apiUrl = this.URL_API;
 
+      try {
+        // Obtener datos del formulario cliente
+        const { data } = await axios.get(
+          `${apiUrl}api/v1/formulariocliente/${id}`,
+          config
+        );
+        const tipoArchivoId = data.tipo_cliente_id || data.tipo_proveedor_id;
+        this.getTipoArchivo(tipoArchivoId, data);
+        if (
+          data.contrato?.length > 0 &&
+          !data.contrato[0].ruta_contrato &&
+          data.contrato[0].transaccion_id
+        ) {
+          await axios.get(
+            `${apiUrl}api/v1/consultaFirmantes/${data.contrato[0].transaccion_id}`,
+            config
+          );
+          await axios.get(
+            `${apiUrl}api/v1/consultaProcesoFirma/${data.contrato[0].transaccion_id}`,
+            config
+          );
+          const { data: updatedData } = await axios.get(
+            `${apiUrl}api/v1/formulariocliente/${id}`,
+            config
+          );
+          const updatedTipoArchivoId =
+            updatedData.tipo_cliente_id || updatedData.tipo_proveedor_id;
+          this.getTipoArchivo(updatedTipoArchivoId, updatedData);
+        }
+      } catch (error) {
+        console.error("Error al consultar el formulario:", error);
+      } finally {
+        // Asegurar que el scroll se habilite siempre
+        document.body.style.overflow = "auto";
+      }
+    },
     convertFile(url) {
       var nombre_archivo = url.split("/")[2];
       url = this.URL_API + url;

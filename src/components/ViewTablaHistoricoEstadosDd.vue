@@ -128,14 +128,16 @@ export default {
         {
           value: "responsable_final",
           label: "Responsable",
-          opciones: ["Igual a", "Contiene"],
-          type: "text",
+          opciones: ["Igual a"],
+          type: "select",
+          opciones_select: [],
         },
         {
           value: "nombre_estado",
           label: "Estado",
-          opciones: ["Igual a", "Contiene"],
-          type: "text",
+          opciones: ["Igual a"],
+          type: "select",
+          opciones_select: [],
         },
         {
           value: "created_at",
@@ -188,6 +190,8 @@ export default {
   mounted() {},
   created() {
     this.getDatos();
+    this.getEstados();
+    this.getResponsables();
   },
   methods: {
     toggleDiv() {
@@ -233,6 +237,29 @@ export default {
         this.showAlert("Error al cargar los datos", "error");
         this.loading = false;
       }
+    },
+    getResponsables() {
+      let self = this;
+      let config = this.configHeader();
+      axios
+        .get(self.URL_API + "api/v1/allUsers", config)
+        .then(function (result) {
+          result.data.forEach((element) => {
+            self.filtros[1].opciones_select.push(element.nombre);
+          });
+        });
+    },
+    getEstados() {
+      let self = this;
+      let config = this.configHeader();
+
+      axios
+        .get(self.URL_API + "api/v1/estadosfirma", config)
+        .then(function (result) {
+          result.data.forEach((element) => {
+            self.filtros[2].opciones_select.push(element.nombre);
+          });
+        });
     },
     formatearFecha(fechaISO) {
       try {
