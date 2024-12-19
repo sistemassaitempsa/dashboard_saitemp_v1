@@ -62,7 +62,7 @@ export default {
           calculado: "false",
         },
         {
-          nombre: "Fecha actualizacion estado",
+          nombre: "Fecha actualizacion",
           orden: "DESC",
           tipo: "fecha",
           calculado: "false",
