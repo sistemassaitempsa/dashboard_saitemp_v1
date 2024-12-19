@@ -4276,7 +4276,7 @@ export default {
     window.removeEventListener("keydown", this.convinacionGuardado);
     window.removeEventListener("keydown", this.convinacionAutoRelleno);
   },
-  async created() {
+  created() {
     // const urlCompleta = window.location.href;
     this.getModulo();
     this.urlExterna();
@@ -4296,7 +4296,7 @@ export default {
     ) {
       this.loading = true;
       this.scrollTop(true);
-      await this.consultaFormulario(this.$route.params.id);
+      this.consultaFormulario(this.$route.params.id);
     }
     this.getRiesgosLaborales();
     this.getCategoriaCargo();
@@ -7022,11 +7022,13 @@ export default {
             updatedData.tipo_cliente_id || updatedData.tipo_proveedor_id;
           this.getTipoArchivo(updatedTipoArchivoId, updatedData);
         }
+        
       } catch (error) {
         console.error("Error al consultar el formulario:", error);
       } finally {
         // Asegurar que el scroll se habilite siempre
         document.body.style.overflow = "auto";
+        this.loading = false;
       }
     },
     convertFile(url) {
@@ -7868,7 +7870,6 @@ export default {
           this.tipo_origen_fondo = item.origen_fondos.tipo_origen_fondos_id;
           this.otro_tipo_origen_fondos = item.origen_fondos.otro_origen;
         }
-        this.loading = false;
       } catch (error) {
         console.log(error);
       }
