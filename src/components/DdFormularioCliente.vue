@@ -79,6 +79,14 @@
         <hr v-if="divExpandido2" />
       </div>
     </div>
+    <div class="row">
+      <div class="col">
+        <label class=""
+          ><b>Los campos marcados con * son obligatorios</b></label
+        >
+      </div>
+    </div>
+
     <form class="was-validated" @submit.prevent="save()">
       <h6 class="tituloseccion">Información general</h6>
       <div id="seccion">
@@ -230,6 +238,7 @@
               aria-describedby="emailHelp"
               v-model="fecha_expedicion"
               :disabled="!persona_natural"
+              max="9999-12-31"
               required
             />
             <div class="invalid-feedback">
@@ -301,6 +310,7 @@
               aria-describedby="emailHelp"
               id="fecha_constitucion"
               v-model="fecha_constitucion"
+              max="9999-12-31"
               required
             />
             <div class="invalid-feedback">
@@ -792,6 +802,11 @@
                 acuerdo_comercial = formatInputUpperCase($event.target.value)
               "
             ></textarea>
+            <div class="d-flex justify-content-end">
+              <small class="char-count"
+                >{{ remainingCharsObservasion3 }}/400</small
+              >
+            </div>
           </div>
         </div>
       </div>
@@ -1390,18 +1405,12 @@
           </div>
           <div class="col-4 mb-3">
             <label class="form-label">Factura única o por CECO: * </label>
-            <input
-              type="text"
-              class="form-control"
-              id="exampleInputEmail1"
-              maxlength="50"
-              aria-describedby="emailHelp"
-              v-model="facturacion_factura"
-              @input="
-                facturacion_factura = formatInputUpperCase($event.target.value)
-              "
-              required
-            />
+            <select class="form-select" required v-model="facturacion_factura">
+              <option value="Única">Única</option>
+              <option value="CECO">CECO</option>
+              <option value="No aplica">No aplica</option>
+            </select>
+
             <div class="invalid-feedback">
               {{ mensaje_error }}
             </div>
@@ -2503,6 +2512,7 @@
               class="form-control"
               id="exampleInputEmail1"
               aria-describedby="emailHelp"
+              max="9999-12-31"
               v-model="item.fecha"
               :required="item.fecha == '' && item.opcion == 1"
             />
@@ -3573,6 +3583,11 @@
               "
               :disabled="bloquea_campos && !permisos[26].autorizado"
             ></textarea>
+            <div class="d-flex justify-content-end">
+              <small class="char-count"
+                >{{ remainingCharsObservasion4 }}/400</small
+              >
+            </div>
           </div>
         </div>
         <div class="row">
@@ -4253,6 +4268,18 @@ export default {
           return ""; // No hay error
         }
       });
+    },
+    remainingCharsObservasion3() {
+      if (this.acuerdo_comercial) {
+        return 0 + this.acuerdo_comercial.length;
+      }
+      return 0;
+    },
+    remainingCharsObservasion4() {
+      if (this.afectacion_servicio) {
+        return 0 + this.afectacion_servicio.length;
+      }
+      return 0;
     },
   },
   watch: {
@@ -7022,7 +7049,6 @@ export default {
             updatedData.tipo_cliente_id || updatedData.tipo_proveedor_id;
           this.getTipoArchivo(updatedTipoArchivoId, updatedData);
         }
-        
       } catch (error) {
         console.error("Error al consultar el formulario:", error);
       } finally {

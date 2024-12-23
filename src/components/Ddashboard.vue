@@ -89,7 +89,7 @@
           ><i v-if="!historicoToggle" class="bi bi-chevron-down"></i>
         </h5>
         <div v-if="!historicoToggle">
-          <div class="row">
+          <div class="row animationHistorico">
             <div class="col-xs-12 col-md-12">
               <h5 class="h5paginate" v-if="datos.length > 0">
                 Mostrando {{ this.datos.length }} de
@@ -98,7 +98,7 @@
               </h5>
             </div>
           </div>
-          <div class="col">
+          <div class="col animationHistorico">
             <TablaHistoricoEstados
               :datos="filteredDatos"
               :total_registros="total_registros_pie"
@@ -559,7 +559,9 @@ h2 {
 .row {
   margin-bottom: 30px;
 }
-
+.animationHistorico {
+  animation: fadeIn 0.3s ease;
+}
 /*spiner*/
 .lds-ring {
   display: inline-block;
@@ -621,6 +623,16 @@ span {
 .minHeight {
   height: 300px;
   min-height: 3em;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 /* fin spinner*/
 </style>
