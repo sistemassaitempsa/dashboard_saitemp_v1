@@ -39,10 +39,13 @@
           {{ item.estado }}
         </div>
         <div v-if="divExpandido" style="text-align: left">
-          {{ item.usuario }}
+          {{ item.actualiza }}
         </div>
         <div v-if="divExpandido" style="text-align: left">
-          {{ reformatearFecha(item.created_at) }}
+          {{ reformatearFecha(item.updated_at) }}
+        </div>
+        <div v-if="divExpandido" style="text-align: left">
+          {{ item.observaciones }}
         </div>
         <hr v-if="divExpandido" />
       </div>
@@ -4398,7 +4401,7 @@ export default {
             this.consulta_departamento_laboratorio = item.nombre;
             break;
           case 5:
-            this.conslta_departamento_rut = item.nombre;
+            this.consulta_departamento_rut = item.nombre;
             break;
         }
       }
@@ -4523,6 +4526,20 @@ export default {
     },
     agregarCamposCliente() {
       var self = this;
+      self.registroCliente.consulta_departamento_rut =
+        this.consulta_departamento_rut;
+      self.registroCliente.consulta_municipio_rut = this.consulta_municipio_rut;
+      self.registroCliente.novedad_servicio = this.novedad_servicio;
+      self.registroCliente.usuario_corregir_id = this.encargado_id;
+      self.registroCliente.afectacion_servicio = this.afectacion_servicio;
+      self.registroCliente.direccion_rut = this.direccion_rut;
+      self.registroCliente.municipio_rut = this.municipio_rut;
+      self.registroCliente.estado_firma_id = this.estado_firma_id;
+      self.registroCliente.consulta_responsable_firma =
+        this.consulta_responsable_firma;
+      self.registroCliente.responsable_id = this.responsable_id;
+      //
+      self.registroCliente.consulta_estado_firma = this.consulta_estado_firma;
       self.registroCliente.consulta_tipo_cliente = this.consulta_tipo_cliente;
       self.registroCliente.consulta_tipo_proveedor =
         this.consulta_tipo_proveedor;
@@ -6883,6 +6900,7 @@ export default {
     },
     crearCliente() {
       this.registroCliente = {
+        consulta_estado_firma: this.consulta_estado_firma,
         novedad_servicio: this.novedad_servicio,
         usuario_corregir_id: this.encargado_id,
         afectacion_servicio: this.afectacion_servicio,
@@ -7162,6 +7180,18 @@ export default {
       if (item.codigo_ciiu_id != "") {
         this.getActividadesCiiu(item.codigo_ciiu_id);
       }
+      this.consulta_departamento_rut = item.consulta_departamento_rut;
+      this.consulta_municipio_rut = item.consulta_municipio_rut;
+      this.novedad_servicio = item.novedad_servicio;
+      this.usuario_corregir_id = item.encargado_id;
+      this.afectacion_servicio = item.afectacion_servicio;
+      this.direccion_rut = item.direccion_rut;
+      this.municipio_rut = item.municipio_rut;
+      this.estado_firma_id = item.estado_firma_id;
+      this.consulta_responsable_firma = item.consulta_responsable_firma;
+      this.responsable_id = item.responsable_id;
+      this.consulta_estado_firma = item.consulta_estado_firma;
+      //
       this.consulta_tipo_cliente = item.consulta_tipo_cliente;
       this.consulta_tipo_proveedor = item.consulta_tipo_proveedor;
       this.consulta_operacion = item.consulta_operacion;
@@ -7490,6 +7520,7 @@ export default {
             }
           });
         });
+
         this.novedades = item.novedades;
         /* this.consulta_observacion_estado = item.nombre_novedad_servicio;
         this.novedad_servicio = item.novedad_servicio; */
