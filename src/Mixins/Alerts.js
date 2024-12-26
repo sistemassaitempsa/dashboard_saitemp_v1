@@ -22,7 +22,6 @@ export const Alerts = {
       });
     },
     messageDelete(titulo = null, funcion, id) {
-      const self = this;
       var title =
         titulo == null ? "Estas seguro de elimiar el resgistro?" : titulo;
       this.$swal
@@ -37,9 +36,7 @@ export const Alerts = {
         })
         .then((result) => {
           if (result.isConfirmed) {
-            funcion(id).then((result) => {
-              self.showAlert(result.data.message, result.data.status);
-            });
+            return funcion(id);
           }
         });
     },

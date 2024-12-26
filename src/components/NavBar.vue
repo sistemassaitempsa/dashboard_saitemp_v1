@@ -3,7 +3,7 @@
     <NotificacionesSocket />
     <nav
       class="navbar navbar-expand-lg navbar-dark gradient-background"
-      style="heigth: 100px"
+      style="height: 80px"
     >
       <div class="container-fluid">
         <a class="navbar-brand" href="">

@@ -22,12 +22,104 @@
         </div>
       </div>
     </div>
+    <div
+      @click="toggleDiv"
+      :class="{
+        expandido: divExpandido,
+        pestaña: !divExpandido,
+        pestaña3: divExpandido,
+      }"
+      class="pestaña"
+      style="overflow-y: auto"
+      v-if="seguimiento.length > 0"
+    >
+      <div v-if="!divExpandido">Seguimiento guardado</div>
+      <div v-for="(item, index) in seguimiento" :key="index">
+        <div v-if="divExpandido" style="text-align: left">
+          {{ item.estado }}
+        </div>
+        <div v-if="divExpandido" style="text-align: left">
+          {{ item.actualiza }}
+        </div>
+        <div v-if="divExpandido" style="text-align: left">
+          {{ reformatearFecha(item.updated_at) }}
+        </div>
+        <div v-if="divExpandido" style="text-align: left">
+          {{ item.observaciones }}
+        </div>
+        <hr v-if="divExpandido" />
+      </div>
+    </div>
+    <div
+      @click="toggleDiv2"
+      :class="{
+        expandido2: divExpandido2,
+        pestaña: !divExpandido2,
+        pestaña2: divExpandido2,
+      }"
+      class="pestaña2"
+      style="overflow-y: auto"
+      v-if="seguimiento_estados.length > 0"
+    >
+      <div v-if="!divExpandido2">Seguimiento estados</div>
+      <div v-for="(item, index) in seguimiento_estados" :key="index">
+        <div v-if="divExpandido2" style="text-align: left">
+          {{ item.estados_firma_final }}
+        </div>
+        <div v-if="divExpandido2" style="text-align: left">
+          {{ item.responsable_final.replace("null", "") }}
+        </div>
+        <div v-if="divExpandido2" style="text-align: left; margin: 5px">
+          <i style="font-size: 1.5rem" class="bi bi-arrow-up-circle"></i> Fecha:
+          {{ reformatearFecha(item.created_at) }}
+        </div>
+        <div v-if="divExpandido2" style="text-align: left">
+          {{ item.estados_firma_inicial }}
+        </div>
+        <div v-if="divExpandido2" style="text-align: left">
+          {{ item.responsable_inicial.replace("null", "") }}
+        </div>
+        <hr v-if="divExpandido2" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label class=""
+          ><b>Los campos marcados con * son obligatorios</b></label
+        >
+      </div>
+    </div>
+
     <form class="was-validated" @submit.prevent="save()">
       <h6 class="tituloseccion">Información general</h6>
       <div id="seccion">
         <p v-if="$route.params.id != undefined">
           Radicado: {{ numero_radicado }}
         </p>
+        <div class="row">
+          <div class="col">
+            <SearchList
+              nombreCampo="Estado: *"
+              @getEstadosIngreso="getEstadosIngreso"
+              eventoCampo="getEstadosIngreso"
+              nombreItem="nombre"
+              :consulta="consulta_estado_firma"
+              :registros="estados_firma_debida_diligencia"
+              placeholder="Seleccione una opción"
+            />
+          </div>
+          <div class="col">
+            <SearchList
+              nombreCampo="Responsable: "
+              @getEncargados="getEncargados"
+              eventoCampo="getEncargados"
+              nombreItem="nombre"
+              :consulta="consulta_responsable_firma"
+              :registros="lista_responsables"
+              placeholder="Seleccione una opción"
+            />
+          </div>
+        </div>
         <div class="row">
           <div class="col-4">
             <SearchList
@@ -149,6 +241,7 @@
               aria-describedby="emailHelp"
               v-model="fecha_expedicion"
               :disabled="!persona_natural"
+              max="9999-12-31"
               required
             />
             <div class="invalid-feedback">
@@ -220,6 +313,7 @@
               aria-describedby="emailHelp"
               id="fecha_constitucion"
               v-model="fecha_constitucion"
+              max="9999-12-31"
               required
             />
             <div class="invalid-feedback">
@@ -282,6 +376,49 @@
               :registros="estratos"
               placeholder="Seleccione una opción"
             />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <SearchList
+              nombreCampo="Departamento del rut: *"
+              nombreItem="nombre"
+              eventoCampo="getDepartamentos"
+              :consulta="consulta_departamento_rut"
+              :registros="departamentos"
+              :ordenCampo="5"
+              @getDepartamentos="getDepartamentos({ id: 43 }, 5)"
+              @getMunicipios="getMunicipios"
+              placeholder="Seleccione una opción"
+            />
+          </div>
+          <div class="col">
+            <SearchList
+              nombreCampo="Ciudad del rut: *"
+              nombreItem="nombre"
+              :registros="municipios"
+              :consulta="consulta_municipio_rut"
+              @setMunicipios="setMunicipios"
+              eventoCampo="setMunicipios"
+              :ordenCampo="5"
+              placeholder="Seleccione una opción"
+            />
+          </div>
+          <div class="col mb-3">
+            <label class="form-label">Dirección del rut: * </label>
+            <input
+              type="text"
+              class="form-control"
+              id="exampleInputEmail1"
+              maxlength="100"
+              @input="direccion_rut = formatInputUpperCase($event.target.value)"
+              aria-describedby="emailHelp"
+              v-model="direccion_rut"
+              required
+            />
+            <div class="invalid-feedback">
+              {{ mensaje_error }}
+            </div>
           </div>
         </div>
         <div class="row">
@@ -533,23 +670,6 @@
               placeholder="Seleccione una opción"
             />
           </div>
-          <div class="col mb-3">
-            <label class="form-label"
-              >Observaciones a acuerdos comerciales:
-            </label>
-            <textarea
-              name=""
-              id="acuerdo_comercial"
-              class="form-control"
-              rows="1"
-              v-model="acuerdo_comercial"
-              @input="
-                acuerdo_comercial = formatInputUpperCase($event.target.value)
-              "
-            ></textarea>
-          </div>
-        </div>
-        <div class="row" v-if="tipo_cliente == 1">
           <div class="col">
             <SearchList
               nombreCampo="Jornada Laboral: *"
@@ -561,6 +681,8 @@
               placeholder="Seleccione una opción"
             />
           </div>
+        </div>
+        <div class="row" v-if="tipo_cliente == 1">
           <div class="col">
             <SearchList
               nombreCampo="Rotación de personal: *"
@@ -586,8 +708,6 @@
               placeholder="Seleccionar"
             />
           </div>
-        </div>
-        <div class="row" v-if="tipo_cliente == 1">
           <div class="col-4">
             <SearchList
               nombreCampo="¿Es empresa del exterior radicada en colombia?: *"
@@ -601,6 +721,8 @@
               placeholder="Seleccionar"
             />
           </div>
+        </div>
+        <div class="row" v-if="tipo_cliente == 1">
           <div class="col-4">
             <SearchList
               nombreCampo="¿Tiene vinculos con alguna empresa activa en saitemp?: *"
@@ -638,8 +760,6 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="row" v-if="tipo_cliente == 1">
           <div class="col-4">
             <SearchList
               nombreCampo="¿Actualmente tienen personal vinculado con empresa temporal?: *"
@@ -653,6 +773,8 @@
               placeholder="Seleccionar"
             />
           </div>
+        </div>
+        <div class="row" v-if="tipo_cliente == 1">
           <div class="col-4">
             <SearchList
               nombreCampo="¿Se realizó la visita presencial a las instalaciones del cliente?: *"
@@ -665,6 +787,29 @@
               @setAfirmacionNegacion="setAfirmacionNegacion"
               placeholder="Seleccionar"
             />
+          </div>
+        </div>
+        <div class="row">
+          <label class="form-label"
+            >Observaciones a acuerdos comerciales:</label
+          >
+          <div class="col mb-3">
+            <textarea
+              name=""
+              id="acuerdos_comerciales"
+              class="form-control"
+              maxlength="400"
+              rows="4"
+              v-model="acuerdo_comercial"
+              @input="
+                acuerdo_comercial = formatInputUpperCase($event.target.value)
+              "
+            ></textarea>
+            <div class="d-flex justify-content-end">
+              <small class="char-count"
+                >{{ remainingCharsObservasion3 }}/400</small
+              >
+            </div>
           </div>
         </div>
       </div>
@@ -876,7 +1021,7 @@
           </div>
           <div class="col">
             <SearchList
-              nombreCampo="¿se require carnet corporativo con espedificaciones distintas?: *"
+              nombreCampo="¿se require carnet corporativo con especificaciones distintas?: *"
               eventoCampo="getAfirmacionNegacion"
               nombreItem="nombre"
               :registros="afirmacionNegacion"
@@ -1263,18 +1408,12 @@
           </div>
           <div class="col-4 mb-3">
             <label class="form-label">Factura única o por CECO: * </label>
-            <input
-              type="text"
-              class="form-control"
-              id="exampleInputEmail1"
-              maxlength="50"
-              aria-describedby="emailHelp"
-              v-model="facturacion_factura"
-              @input="
-                facturacion_factura = formatInputUpperCase($event.target.value)
-              "
-              required
-            />
+            <select class="form-select" required v-model="facturacion_factura">
+              <option value="Única">Única</option>
+              <option value="CECO">CECO</option>
+              <option value="No aplica">No aplica</option>
+            </select>
+
             <div class="invalid-feedback">
               {{ mensaje_error }}
             </div>
@@ -2376,6 +2515,7 @@
               class="form-control"
               id="exampleInputEmail1"
               aria-describedby="emailHelp"
+              max="9999-12-31"
               v-model="item.fecha"
               :required="item.fecha == '' && item.opcion == 1"
             />
@@ -3409,6 +3549,69 @@
           </div>
         </div>
       </div>
+      <h6 v-if="$route.params.id != undefined" class="tituloseccion">
+        Observaciones del responsable.
+      </h6>
+      <div id="seccion" v-if="$route.params.id != undefined">
+        <div class="row">
+          <div class="col-6">
+            <SearchList
+              nombreCampo="Novedad en servicio: *"
+              nombreItem="nombre"
+              :registros="observaciones_estado"
+              @getObservacionesEstado="getObservacionesEstado"
+              eventoCampo="getObservacionesEstado"
+              :ordenCampo="2"
+              placeholder="Seleccione una opción"
+              :consulta="consulta_observacion_estado"
+              :valida_campo="true"
+              :disabled="bloquea_campos && !permisos[2].autorizado"
+              required
+            />
+          </div>
+          <div
+            class="col mb-6"
+            v-if="consulta_observacion_estado == 'Servicio no conforme'"
+          >
+            <label class="form-label">Observaciones no conformidad: </label>
+            <textarea
+              name=""
+              id="afectacion_servicio"
+              class="form-control"
+              rows="1"
+              v-model="afectacion_servicio"
+              placeholder="Solo para no conformidades"
+              @input="
+                afectacion_servicio = formatInputUpperCase($event.target.value)
+              "
+              :disabled="bloquea_campos && !permisos[2].autorizado"
+            ></textarea>
+            <div class="d-flex justify-content-end">
+              <small class="char-count"
+                >{{ remainingCharsObservasion4 }}/400</small
+              >
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div
+            class="col-6"
+            v-if="consulta_observacion_estado == 'Servicio no conforme'"
+          >
+            <SearchList
+              nombreCampo="Corregir por: "
+              @getEncargadosCorregir="getEncargadosCorregir"
+              eventoCampo="getEncargadosCorregir"
+              nombreItem="nombre"
+              :consulta="consulta_encargado_corregir"
+              :registros="lista_encargados_corregir"
+              placeholder="Seleccione una opción"
+              :valida_campo="false"
+              :disabled="bloquea_campos && !permisos[2].autorizado"
+            />
+          </div>
+        </div>
+      </div>
       <div class="col-3" v-if="hide_bottons">
         <SearchList
           nombreCampo="Registros guardados"
@@ -3423,7 +3626,7 @@
       </div>
       <div class="row">
         <!-- <div class="col" style="margin-top:30px">
-                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                    <div dsa class="btn-group" role="group" aria-label="Basic mixed styles example">
                         <button v-if="permisos[1].autorizado" class="btn btn-success" type="button"
                             @click="hideBottons()">Generar pdf</button>
                         <button type="button" v-if="permisos[0].autorizado && ruta_id != undefined"
@@ -3545,15 +3748,86 @@
               <li v-if="permisos[0].autorizado && ruta_id != undefined">
                 <ConsultaContrato class="ct" :item_id="ruta_id" />
               </li>
+              <li v-if="permisos[0].autorizado && ruta_id != undefined">
+                <hr class="dropdown-divider" />
+              </li>
+              <li v-if="permisos[0].autorizado && ruta_id != undefined">
+                <button
+                  v-if="estado_firma_id_copia == 4 && !contrato[0]"
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  @click="openModalFirmas"
+                >
+                  Enviar contrato
+                </button>
+                <button
+                  v-if="contrato[0]"
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  @click="openModalEstadoContrato"
+                >
+                  Estado contrato enviado
+                </button>
+              </li>
             </ul>
           </div>
         </div>
       </div>
     </form>
+    <div
+      class="row"
+      v-if="novedades.length > 0"
+      style="text-align: left; clear: both; margin-bottom: 40px"
+    >
+      <h5 @click="novedadesToggle = !novedadesToggle" style="cursor: pointer">
+        Historico de novedades
+        <i v-if="novedadesToggle" class="bi bi-chevron-compact-up"></i
+        ><i v-if="!novedadesToggle" class="bi bi-chevron-down"></i>
+      </h5>
+      <div class="table-responsive" v-if="!novedadesToggle">
+        <table
+          class="table table-striped table-hover table-bordered align-middle"
+        >
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Observaciones</th>
+              <th scope="col">Usuario que guardó la novedad</th>
+              <th scope="col">Usuario que corrige</th>
+              <th scope="col">Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in novedades" :key="index">
+              <th scope="row">{{ index }}</th>
+              <td>{{ item.observaciones }}</td>
+              <td>{{ item.usuario_guarda }}</td>
+              <td>{{ item.nombre_usuario_corrige }}</td>
+              <td>{{ reformatearFechaSinHora(item.created_at) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div v-if="toogleModalFirmas">
+      <ModalCorreos
+        :representante_legal="representantes_legales[0]"
+        :registro_id="ruta_id"
+        @closeModalCorreos="closeModalCorreos"
+      ></ModalCorreos>
+    </div>
+    <div v-if="toogleModalEstadoContrato">
+      <ModalEstadoContrato
+        :contrato="contrato[0]"
+        @closeModalEstadoContrato="closeModalEstadoContrato"
+      ></ModalEstadoContrato>
+    </div>
   </div>
 </template>
 <script>
 import axios from "axios";
+import ModalCorreos from "./ModalCorreos.vue";
 import SearchList from "./SearchList.vue";
 import SearchTable from "./SearchTable.vue";
 import ListaMultiple from "./ListaMultiple.vue";
@@ -3561,17 +3835,20 @@ import Loading from "./Loading.vue";
 import { Scroll } from "../Mixins/Scroll.js";
 import { Alerts } from "../Mixins/Alerts.js";
 import { Token } from "../Mixins/Token.js";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+/* import jsPDF from "jspdf";
+import html2canvas from "html2canvas"; */
 import EditorTextoHtml from "./EditorTextoHtml.vue";
 import { Permisos } from "../Mixins/Permisos.js";
 import ConsultaContrato from "./ConsultaContrato.vue";
 import RegistroCambio from "./RegistroCambio.vue";
 import FlotanteInteraccionCliente from "./FlotanteInteraccionCliente.vue";
 import FlotanteSelecciondd from "./FlotanteSelecciondd.vue";
+import ModalEstadoContrato from "./ModalEstadoContrato.vue";
 
 export default {
   components: {
+    ModalEstadoContrato,
+    ModalCorreos,
     SearchList,
     SearchTable,
     ListaMultiple,
@@ -3584,12 +3861,53 @@ export default {
   },
   mixins: [Scroll, Alerts, Token, Permisos],
   props: {
+    menu: [],
     userlogued: {
       default: "",
     },
   },
   data() {
     return {
+      novedadesToggle: true,
+      novedades: [],
+      tamano_texto_version: "",
+      toogleModalEstadoContrato: false,
+      contrato: [],
+      toogleModalFirmas: false,
+      bloquea_campos: false,
+      menu_id: "",
+      encargado_corregir_correo: "",
+      encargado_id_copia: "",
+      correoResponsable: "",
+      responsable_id_copia: "",
+      estado_firma_id_copia: "",
+      correosSeleccionados: {
+        correos: [],
+      },
+      novedad_servicio: "",
+      consulta_encargado_corregir: "",
+      encargado_id: "",
+      lista_encargados_corregir: [],
+      afectacion_servicio: "",
+      consulta_observacion_estado: "",
+      observaciones_estado: [],
+      direccion_rut: "",
+      consulta_pais_rut: "Colombia",
+      consulta_departamento_rut: "",
+      consulta_municipio_rut: "",
+      municipio_rut: "",
+      seguimiento: [],
+      seguimiento_estados: [],
+      divExpandido: false,
+      divExpandido2: false,
+      consulta_responsable_firma: "",
+      estado_firma_id: "",
+      consulta_estado_firma: "",
+      consulta_responsable: "",
+      responsable_id: "",
+      lista_responsables: [],
+      lista_responsables_corregir: [],
+      estados_firma_debida_diligencia: [],
       URL_API: process.env.VUE_APP_URL_API,
       proveedor: false,
       cliente: false,
@@ -3948,18 +4266,35 @@ export default {
         }
       });
     },
+    remainingCharsObservasion3() {
+      if (this.acuerdo_comercial) {
+        return 0 + this.acuerdo_comercial.length;
+      }
+      return 0;
+    },
+    remainingCharsObservasion4() {
+      if (this.afectacion_servicio) {
+        return 0 + this.afectacion_servicio.length;
+      }
+      return 0;
+    },
   },
   watch: {
     $route() {
       this.limpiarformulario();
+      this.getModulo();
     },
     // tipo_cargo() {
     //     this.getSubCategoriaCargo(this.tipo_cargo)
     // }
   },
+  menu() {
+    this.getModulo();
+  },
   mounted() {
     window.addEventListener("keydown", this.convinacionGuardado);
     window.addEventListener("keydown", this.convinacionAutoRelleno);
+    this.getModulo();
   },
   beforeDestroy() {
     window.removeEventListener("keydown", this.convinacionGuardado);
@@ -3967,6 +4302,7 @@ export default {
   },
   created() {
     // const urlCompleta = window.location.href;
+    this.getModulo();
     this.urlExterna();
     // if (urlCompleta.includes('debidadiligencia.saitempsa.com')) {
     //     this.URL_API = 'http://debidadiligencia.saitempsa.com:8484/aplicaciones/api/public/'
@@ -4011,6 +4347,7 @@ export default {
         .get(self.URL_API + "api/v1/versiondebidadiligencia", config)
         .then(function (result) {
           self.versiones = result.data;
+          self.tamano_texto_version = result.data[0].tamano_texto;
         });
     },
     validaCamposDinamicos(index, bandera = null) {
@@ -4036,6 +4373,9 @@ export default {
           case 4:
             this.consulta_pais_laboratorio = item.nombre;
             break;
+          case 5:
+            this.consulta_pais_rut = "Colombia";
+            break;
         }
       }
     },
@@ -4053,6 +4393,9 @@ export default {
             break;
           case 4:
             this.consulta_departamento_laboratorio = item.nombre;
+            break;
+          case 5:
+            this.consulta_departamento_rut = item.nombre;
             break;
         }
       }
@@ -4177,6 +4520,20 @@ export default {
     },
     agregarCamposCliente() {
       var self = this;
+      self.registroCliente.consulta_departamento_rut =
+        this.consulta_departamento_rut;
+      self.registroCliente.consulta_municipio_rut = this.consulta_municipio_rut;
+      self.registroCliente.novedad_servicio = this.novedad_servicio;
+      self.registroCliente.usuario_corregir_id = this.encargado_id;
+      self.registroCliente.afectacion_servicio = this.afectacion_servicio;
+      self.registroCliente.direccion_rut = this.direccion_rut;
+      self.registroCliente.municipio_rut = this.municipio_rut;
+      self.registroCliente.estado_firma_id = this.estado_firma_id;
+      self.registroCliente.consulta_responsable_firma =
+        this.consulta_responsable_firma;
+      self.registroCliente.responsable_id = this.responsable_id;
+      //
+      self.registroCliente.consulta_estado_firma = this.consulta_estado_firma;
       self.registroCliente.consulta_tipo_cliente = this.consulta_tipo_cliente;
       self.registroCliente.consulta_tipo_proveedor =
         this.consulta_tipo_proveedor;
@@ -4522,7 +4879,6 @@ export default {
       y = x % 11;
 
       this.digito_verificacion = y > 1 ? 11 - y : y;
-      console.log("");
     },
     hideBottons() {
       var self = this;
@@ -4533,59 +4889,14 @@ export default {
       }, "10");
     },
     generarPDF() {
-      const elemento = document.getElementById("contenedor-formulario");
-
-      html2canvas(elemento).then((canvas) => {
-        const contenidoDataURL = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "pt", "A3");
-
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const margenHorizontal = 10;
-        const imagenWidth = pdfWidth - 2 * margenHorizontal;
-        const imagenHeight = (imagenWidth * canvas.height) / canvas.width;
-
-        const contenidoHeight = elemento.offsetHeight;
-        const margenSuperior = 10;
-        const margenInferior = 10;
-        const areaImpresionHeight =
-          pdf.internal.pageSize.getHeight() - margenSuperior - margenInferior;
-
-        let contenidoRestante = contenidoHeight;
-        let paginaActual = 0;
-
-        while (contenidoRestante > 0) {
-          const alturaPagina = Math.min(areaImpresionHeight, contenidoRestante);
-          const desplazamientoVertical =
-            -(areaImpresionHeight * paginaActual) + margenSuperior;
-          pdf.addImage(
-            contenidoDataURL,
-            "PNG",
-            margenHorizontal,
-            desplazamientoVertical,
-            imagenWidth,
-            imagenHeight
-          );
-          contenidoRestante -= alturaPagina;
-
-          paginaActual++;
-
-          if (contenidoRestante > 0) {
-            pdf.addPage();
-          }
-        }
-        pdf.deletePage(paginaActual);
-        pdf.deletePage(paginaActual - 1);
-
-        // Eliminar páginas en blanco adicionales
-        const paginasTotales = pdf.internal.getNumberOfPages();
-        if (paginaActual < paginasTotales) {
-          for (let i = paginasTotales; i > paginaActual; i--) {
-            pdf.deletePage(i);
-          }
-        }
-
-        pdf.save("archivo.pdf");
-      });
+      /*  let config = this.configHeader(); */
+      if (this.$route.params.id !== undefined) {
+        const urlDescarga =
+          this.URL_API +
+          "api/v1/formulariocliente/generarpdf/" +
+          this.$route.params.id;
+        window.open(urlDescarga, "_blank");
+      }
     },
     formatInput(value) {
       const formattedValue =
@@ -5465,6 +5776,9 @@ export default {
             this.laboratorios_medicos_agregados = [];
             this.laboratorios_medicos = [];
             break;
+          case 5:
+            this.municipio_rut = item.id;
+            this.consulta_municipio_rut = item.nombre;
         }
       }
     },
@@ -5535,6 +5849,45 @@ export default {
       });
     },
     limpiarformulario() {
+      this.novedades = [];
+      this.tamano_texto_version = "";
+      this.toogleModalEstadoContrato = false;
+      this.contrato = [];
+      this.toogleModalFirmas = false;
+      this.bloquea_campos = false;
+      this.menu_id = "";
+      this.encargado_corregir_correo = "";
+      this.encargado_id_copia = "";
+      this.correoResponsable = "";
+      this.responsable_id_copia = "";
+      this.estado_firma_id_copia = "";
+      this.correosSeleccionados = {
+        correos: [],
+      };
+      this.novedad_servicio = "";
+      this.consulta_encargado_corregir = "";
+      this.encargado_id = "";
+      this.lista_encargados_corregir = [];
+      this.afectacion_servicio = "";
+      this.consulta_observacion_estado = "";
+      this.observaciones_estado = [];
+      this.direccion_rut = "";
+      this.consulta_pais_rut = "Colombia";
+      this.consulta_departamento_rut = "";
+      this.consulta_municipio_rut = "";
+      this.municipio_rut = "";
+      this.seguimiento = [];
+      this.seguimiento_estados = [];
+      this.divExpandido = false;
+      this.divExpandido2 = false;
+      this.consulta_responsable_firma = "";
+      this.estado_firma_id = "";
+      this.consulta_estado_firma = "";
+      this.consulta_responsable = "";
+      this.responsable_id = "";
+      this.lista_responsables = [];
+      this.lista_responsables_corregir = [];
+      this.estados_firma_debida_diligencia = [];
       this.cargos = [{ cargo: "", requisitos: [], examenes: [], riesgo: "" }];
       this.cargos2 = [
         {
@@ -5983,6 +6336,7 @@ export default {
         );
         return true;
       }
+
       if (
         (this.jornada_laboral == "" && this.tipo_cliente == 1) ||
         this.jornada_laboral == undefined
@@ -6043,6 +6397,7 @@ export default {
       //     this.showAlert('Error, los siguientes archivos no fueron adjuntados. ' + mensaje_error, 'error')
       //     return true
       // }
+
       this.file.forEach(function (item) {
         if (item.size > self.limite) {
           self.showAlert(
@@ -6054,7 +6409,17 @@ export default {
           return true;
         }
       });
-
+      if (this.departamento_rut == "") {
+        this.showAlert(
+          "Error, debe diligenciar el campo Departamento RUT.",
+          "error"
+        );
+        return true;
+      }
+      if (this.direccion_rut == "") {
+        this.showAlert("Error, debe diligenciar la direccion RUT.", "error");
+        return true;
+      }
       var valida_campo = 0;
       var valida_campo_dependiente = 0;
       this.accionistas.forEach(function (item) {
@@ -6258,6 +6623,20 @@ export default {
         );
         return true;
       }
+      if (this.novedad_servicio == "" && this.$route.params.id != undefined) {
+        this.showAlert(
+          "Error, debe diligenciar el campo Novedad en servicio",
+          "error"
+        );
+        return true;
+      }
+      if (this.municipio_rut == "") {
+        this.showAlert(
+          "Error, debe diligenciar el municipio del rut.",
+          "error"
+        );
+        return true;
+      }
       if (this.pasivos == "") {
         this.showAlert(
           "Error, debe diligenciar los ingresos pasivos.",
@@ -6410,6 +6789,20 @@ export default {
       });
       return false;
     },
+    enviarCorreos(id, modulo, correosResponsables) {
+      this.loading = true;
+      let config = this.configHeader();
+      axios
+        .post(
+          this.URL_API + "api/v1/enviarCorreoDD/" + id,
+          correosResponsables,
+          config
+        )
+        .then((response) => {
+          this.showAlert(response.data.message, response.data.status);
+          this.loading = false;
+        });
+    },
     save(registro_cambios = null) {
       let self = this;
       this.loading = true;
@@ -6424,7 +6817,20 @@ export default {
         this.loading = false;
         return;
       }
-
+      if (this.correoResponsable) {
+        this.correosSeleccionados.correos.push({
+          correo: this.correoResponsable,
+          observacion: "",
+          corregir: false,
+        });
+      }
+      if (this.encargado_corregir_correo) {
+        this.correosSeleccionados.correos.push({
+          correo: this.encargado_corregir_correo,
+          observacion: this.afectacion_servicio,
+          corregir: true,
+        });
+      }
       try {
         this.crearCliente();
         let config = this.configHeader();
@@ -6440,6 +6846,11 @@ export default {
               if (result.data.message == "ok") {
                 self.guardarArchivos(result.data.client);
                 self.cliente_existe = true;
+                self.enviarCorreos(
+                  result.data.client,
+                  self.menu_id,
+                  self.correosSeleccionados
+                );
               } else {
                 this.loading = false;
                 self.showAlert(result.data.message, result.data.status);
@@ -6456,6 +6867,11 @@ export default {
             .then(function (result) {
               if (result.data.message == "ok") {
                 self.guardarArchivos(result.data.client);
+                self.enviarCorreos(
+                  result.data.client,
+                  self.menu_id,
+                  self.correosSeleccionados
+                );
               }
             });
         }
@@ -6463,8 +6879,30 @@ export default {
         console.log(error);
       }
     },
+    getObservacionesEstado(item = null) {
+      if (item != null) {
+        this.consulta_observacion_estado = item.nombre;
+        this.novedad_servicio = item.id;
+      }
+      let self = this;
+      let config = this.configHeader();
+      axios
+        .get(self.URL_API + "api/v1/observacionestado", config)
+        .then(function (result) {
+          self.observaciones_estado = result.data;
+        });
+    },
     crearCliente() {
       this.registroCliente = {
+        consulta_estado_firma: this.consulta_estado_firma,
+        novedad_servicio: this.novedad_servicio,
+        usuario_corregir_id: this.encargado_id,
+        afectacion_servicio: this.afectacion_servicio,
+        direccion_rut: this.direccion_rut,
+        municipio_rut: this.municipio_rut,
+        estado_firma_id: this.estado_firma_id,
+        responsable: this.consulta_responsable_firma,
+        responsable_id: this.responsable_id,
         operacion: this.operacion,
         tipo_persona: this.tipo_persona,
         digito_verificacion: this.digito_verificacion,
@@ -6589,22 +7027,48 @@ export default {
       this.registroCliente.tipos_contratos_agregados =
         this.tipos_contratos_agregados;
     },
-    consultaFormulario(id) {
-      let self = this;
-      let config = this.configHeader();
-      axios
-        .get(self.URL_API + "api/v1/formulariocliente/" + id, config)
-        .then(function (result) {
-          if (result.data.tipo_cliente_id == 1) {
-            self.getTipoArchivo(result.data.tipo_cliente_id, result.data);
-          } else {
-            self.getTipoArchivo(result.data.tipo_proveedor_id, result.data);
-          }
-          // self.llenarFormulario(result.data)
-          document.body.style.overflow = "auto";
-        });
-    },
 
+    async consultaFormulario(id) {
+      const config = this.configHeader();
+      const apiUrl = this.URL_API;
+
+      try {
+        // Obtener datos del formulario cliente
+        const { data } = await axios.get(
+          `${apiUrl}api/v1/formulariocliente/${id}`,
+          config
+        );
+        const tipoArchivoId = data.tipo_cliente_id || data.tipo_proveedor_id;
+        this.getTipoArchivo(tipoArchivoId, data);
+        if (
+          data.contrato?.length > 0 &&
+          !data.contrato[0].ruta_contrato &&
+          data.contrato[0].transaccion_id
+        ) {
+          await axios.get(
+            `${apiUrl}api/v1/consultaFirmantes/${data.contrato[0].transaccion_id}`,
+            config
+          );
+          await axios.get(
+            `${apiUrl}api/v1/consultaProcesoFirma/${data.contrato[0].transaccion_id}`,
+            config
+          );
+          const { data: updatedData } = await axios.get(
+            `${apiUrl}api/v1/formulariocliente/${id}`,
+            config
+          );
+          const updatedTipoArchivoId =
+            updatedData.tipo_cliente_id || updatedData.tipo_proveedor_id;
+          this.getTipoArchivo(updatedTipoArchivoId, updatedData);
+        }
+      } catch (error) {
+        console.error("Error al consultar el formulario:", error);
+      } finally {
+        // Asegurar que el scroll se habilite siempre
+        document.body.style.overflow = "auto";
+        this.loading = false;
+      }
+    },
     convertFile(url) {
       var nombre_archivo = url.split("/")[2];
       url = this.URL_API + url;
@@ -6617,6 +7081,80 @@ export default {
           });
           return archivo;
         });
+    },
+    getEstadosIngreso(item = null) {
+      if (item != null) {
+        this.consulta_responsable_firma = "";
+        this.estado_firma_id = item.id;
+        this.consulta_estado_firma = item.nombre;
+        this.consulta_responsable = "";
+        this.responsable_id = "";
+        this.lista_responsables = [];
+        this.lista_responsables_corregir = [];
+        this.getEncargados(null, item.id);
+      }
+      let self = this;
+      let config = this.configHeader();
+      axios
+        .get(self.URL_API + "api/v1/estadosfirma", config)
+        .then(function (result) {
+          self.estados_firma_debida_diligencia = result.data;
+        });
+    },
+    closeModalCorreos() {
+      this.toogleModalFirmas = false;
+      this.consultaFormulario(this.$route.params.id);
+    },
+    closeModalEstadoContrato() {
+      this.toogleModalEstadoContrato = false;
+      this.consultaFormulario(this.$route.params.id);
+    },
+    reformatearFecha(fechaOriginal) {
+      const fechaHora = new Date(fechaOriginal);
+      const año = fechaHora.getFullYear();
+      const mes = (fechaHora.getMonth() + 1).toString().padStart(2, "0"); // Los meses son indexados desde 0
+      const dia = fechaHora.getDate().toString().padStart(2, "0");
+      const horas = fechaHora.getHours().toString().padStart(2, "0");
+      const minutos = fechaHora.getMinutes().toString().padStart(2, "0");
+      const segundos = fechaHora.getSeconds().toString().padStart(2, "0");
+      const fechaFormateada = `${dia}/${mes}/${año}  `;
+      const horaFormateada = `${horas}:${minutos}:${segundos}`;
+      return fechaFormateada + " " + horaFormateada;
+    },
+    reformatearFechaSinHora(fechaOriginal) {
+      const fechaHora = new Date(fechaOriginal);
+      const año = fechaHora.getFullYear();
+      const mes = (fechaHora.getMonth() + 1).toString().padStart(2, "0"); // Los meses son indexados desde 0
+      const dia = fechaHora.getDate().toString().padStart(2, "0");
+
+      const fechaFormateada = `${dia}/${mes}/${año}  `;
+
+      return fechaFormateada;
+    },
+    openModalFirmas() {
+      this.toogleModalFirmas = true;
+    },
+    openModalEstadoContrato() {
+      this.toogleModalEstadoContrato = true;
+    },
+    getEncargados(item = null, id = null) {
+      if (item != null) {
+        this.responsable_id = item.usuario_id;
+        this.consulta_encargado = item.nombre;
+        this.consulta_responsable_firma = item.nombre;
+        if (this.responsable_id != this.responsable_id_copia) {
+          this.correoResponsable = item.email;
+        }
+      }
+      if (id != null) {
+        let self = this;
+        let config = this.configHeader();
+        axios
+          .get(self.URL_API + "api/v1/estadoResponsableFirma/" + id, config)
+          .then(function (result) {
+            self.lista_responsables = result.data;
+          });
+      }
     },
     llenarFormularioGuardado(item = null) {
       var self = this;
@@ -6636,6 +7174,18 @@ export default {
       if (item.codigo_ciiu_id != "") {
         this.getActividadesCiiu(item.codigo_ciiu_id);
       }
+      this.consulta_departamento_rut = item.consulta_departamento_rut;
+      this.consulta_municipio_rut = item.consulta_municipio_rut;
+      this.novedad_servicio = item.novedad_servicio;
+      this.usuario_corregir_id = item.encargado_id;
+      this.afectacion_servicio = item.afectacion_servicio;
+      this.direccion_rut = item.direccion_rut;
+      this.municipio_rut = item.municipio_rut;
+      this.estado_firma_id = item.estado_firma_id;
+      this.consulta_responsable_firma = item.consulta_responsable_firma;
+      this.responsable_id = item.responsable_id;
+      this.consulta_estado_firma = item.consulta_estado_firma;
+      //
       this.consulta_tipo_cliente = item.consulta_tipo_cliente;
       this.consulta_tipo_proveedor = item.consulta_tipo_proveedor;
       this.consulta_operacion = item.consulta_operacion;
@@ -6918,7 +7468,42 @@ export default {
         item.calidad_tributaria[0].numero_resolucion;
       this.calidad_tributaria[2].fecha = item.calidad_tributaria[0].fecha;
     },
-
+    getEncargadosCorregir(item = null) {
+      if (item != null) {
+        this.encargado_id = item.usuario_id;
+        this.consulta_encargado_corregir = item.nombre;
+        console.log(this.encargado_id);
+        console.log(this.encargado_id_copia);
+        if (this.encargado_id != this.encargado_id_copia) {
+          this.encargado_corregir_correo = item.email;
+        }
+      }
+      let self = this;
+      let config = this.configHeader();
+      axios
+        .get(self.URL_API + "api/v1/estadoResponsableFirma ", config)
+        .then(function (result) {
+          self.lista_encargados_corregir = result.data;
+        });
+    },
+    getModulo() {
+      var self = this;
+      if (self.$route.path != "/navbar/gestion-ingresosl") {
+        var ruta =
+          self.$route.path.split("/")[1] +
+          "/" +
+          self.$route.path.split("/")[2] +
+          "/" +
+          self.$route.path.split("/")[3];
+        this.menu.forEach(function (item) {
+          item.opciones.forEach((element) => {
+            if (element.url == ruta) {
+              self.menu_id = element.id;
+            }
+          });
+        });
+      }
+    },
     llenarFormulario(item = null) {
       try {
         let self = this;
@@ -6929,6 +7514,30 @@ export default {
             }
           });
         });
+
+        this.novedades = item.novedades;
+        /* this.consulta_observacion_estado = item.nombre_novedad_servicio;
+        this.novedad_servicio = item.novedad_servicio; */
+        this.contrato = item.contrato;
+        this.direccion_rut = item.dirección_rut;
+        this.bloquea_campos = true;
+        /*   this.consulta_encargado_corregir = item.nombre_usuario_corregir; */
+        /*    this.afectacion_servicio = item.afectacion_servicio; */
+        /*     this.encargado_id = item.usuario_corregir_id; */
+        this.encargado_id_copia = item.usuario_corregir_id;
+        this.estado_firma_id_copia = item.estado_firma_id;
+        this.consulta_departamento_rut = item.departamento_rut;
+        this.departamento_rut = item.departamento_rut_id;
+        this.consulta_municipio_rut = item.municipio_rut;
+        this.municipio_rut = item.municipio_rut_id;
+        this.seguimiento = item.seguimiento;
+        this.seguimiento_estados = item.seguimiento_estados;
+        this.getEncargados(null, item.estado_firma_id);
+        this.responsable_id_copia = item.responsable_id;
+        this.responsable_id = item.responsable_id;
+        this.estado_firma_id = item.estado_firma_id;
+        this.consulta_responsable_firma = item.responsable;
+        this.consulta_estado_firma = item.nombre_estado_firma;
         this.getActividadesCiiu(item.codigo_ciiu_id);
         this.operacion = item.operacion_id;
         this.consulta_operacion = item.tipo_operacion;
@@ -7312,10 +7921,18 @@ export default {
           this.tipo_origen_fondo = item.origen_fondos.tipo_origen_fondos_id;
           this.otro_tipo_origen_fondos = item.origen_fondos.otro_origen;
         }
-        this.loading = false;
       } catch (error) {
         console.log(error);
       }
+    },
+
+    toggleDiv() {
+      this.divExpandido = !this.divExpandido;
+      this.divExpandido2 = false;
+    },
+    toggleDiv2() {
+      this.divExpandido2 = !this.divExpandido2;
+      this.divExpandido = false;
     },
   },
 };
@@ -7518,6 +8135,145 @@ ul li {
   margin: 0px;
   margin-top: 5px;
   color: rgba(0, 0, 0, 0.377);
+}
+.pestaña {
+  position: fixed;
+  top: 30%;
+  right: 0;
+  background-color: lightblue;
+  padding: 10px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  cursor: pointer;
+  z-index: 1000;
+  background: rgb(0, 107, 63);
+  color: white;
+  background: linear-gradient(
+    95deg,
+    rgba(0, 107, 63, 1) 4%,
+    rgba(26, 150, 56, 1) 19%,
+    rgba(48, 159, 128, 1) 45%,
+    rgba(22, 119, 115, 1) 63%,
+    rgba(4, 66, 105, 1) 88%
+  );
+}
+
+.pestaña2 {
+  position: fixed;
+  top: 37%;
+  right: 0;
+  background-color: lightblue;
+  padding: 10px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  cursor: pointer;
+  z-index: 1000;
+  background: rgb(0, 107, 63);
+  color: white;
+  background: linear-gradient(
+    95deg,
+    rgba(0, 107, 63, 1) 4%,
+    rgba(26, 150, 56, 1) 19%,
+    rgba(48, 159, 128, 1) 45%,
+    rgba(22, 119, 115, 1) 63%,
+    rgba(4, 66, 105, 1) 88%
+  );
+}
+
+.pestaña3 {
+  position: fixed;
+  top: 45%;
+  right: 0;
+  background-color: lightblue;
+  padding: 10px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  cursor: pointer;
+  z-index: 1000;
+  background: rgb(0, 107, 63);
+  color: white;
+  background: linear-gradient(
+    95deg,
+    rgba(0, 107, 63, 1) 4%,
+    rgba(26, 150, 56, 1) 19%,
+    rgba(48, 159, 128, 1) 45%,
+    rgba(22, 119, 115, 1) 63%,
+    rgba(4, 66, 105, 1) 88%
+  );
+}
+
+/* Animación para expandir */
+@keyframes expandir {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 300px;
+  }
+}
+
+@keyframes contraer {
+  from {
+    width: 300px;
+  }
+
+  to {
+    width: 0;
+  }
+}
+
+/* Animación para expandir */
+@keyframes expandir2 {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 300px;
+  }
+}
+
+@keyframes contraer2 {
+  from {
+    width: 300px;
+  }
+
+  to {
+    width: 0;
+  }
+}
+
+/* Estilos cuando el div está expandido */
+.expandido {
+  animation: expandir 1s ease;
+  /* Animación para expandir */
+  width: 300px;
+  height: 300px;
+  /* Anchura del contenido expandido */
+}
+
+.pestaña:not(.expandido) {
+  animation: contraer 1s ease;
+  /* Animación para contraer */
+  overflow: hidden;
+  /* Ocultar el contenido al contraer */
+}
+
+/* Estilos cuando el div está expandido */
+.expandido2 {
+  animation: expandir2 1s ease;
+  /* Animación para expandir */
+  width: 300px;
+  height: 300px;
+  /* Anchura del contenido expandido */
+}
+
+.pestaña2:not(.expandido2) {
+  animation: contraer2 1s ease;
+  /* Animación para contraer */
+  overflow: hidden;
+  /* Ocultar el contenido al contraer */
 }
 
 /* .orientacion{

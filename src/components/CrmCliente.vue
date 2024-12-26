@@ -1947,12 +1947,14 @@ export default {
       if (item.compromisos.length > 0) {
         for (let i = 0; i < item.compromisos.length; i++) {
           const compromiso = item.compromisos[i];
+
           if (compromiso) {
             this.compromisos[i] = {
               ...compromiso,
               observacion: compromiso.observacion ?? "",
             };
           } else {
+            // Crear un nuevo objeto compromiso si no existe
             this.compromisos[i] = {
               titulo: `compromiso${i + 1}`,
               id: "",
@@ -2806,6 +2808,7 @@ export default {
           item.opciones.forEach((element) => {
             if (element.url == ruta) {
               self.menu_id = element.id;
+
               self.historicoCorreos();
             }
           });
