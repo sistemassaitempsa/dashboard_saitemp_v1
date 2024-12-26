@@ -994,7 +994,7 @@
         </div>
       </div>
       <!-- :disabled="deshabilitar_boton" -->
-      <button class="btn btn-success m-4" type="submit">
+      <button class="btn btn-success m-4" type="submit" v-if="(permisos[35].autorizado && $route.params.id != undefined) || (permisos[36].autorizado && $route.params.id == undefined)">
         Guardar formulario
       </button>
       <button

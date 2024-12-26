@@ -2575,49 +2575,111 @@ export default {
       }
     },
     loadPartial(nit_documento) {
-      const savedForms = JSON.parse(localStorage.getItem("savedForms")) || [];
-      const formData = savedForms.find(
-        (form) => form.nit_documento === nit_documento
-      );
-      if (formData) {
-        this.correo_responsable2 = formData.correo_responsable2 || "";
-        this.correo_responsable1 = formData.correo_responsable1 || "";
-        this.correo_responsablePqrsf = formData.correo_responsablePqrsf || "";
-        this.visitante_id = formData.visitante_id || "";
-        this.compromisos = formData.compromisos;
-        this.empresa_cliente_nombre = formData.empresa_cliente_nombre || "";
-        this.temasPrincipales = formData.temasPrincipales;
-        this.consulta_empresa_cliente = formData.consulta_empresa_cliente || "";
-        this.alcance_visita = formData.alcance_visita || "";
-        this.objetivo_visita = formData.objetivo_visita || "";
-        this.cargo_visitado = formData.cargo_visitado || "";
-        this.visitado = formData.visitado || "";
-        this.cargo_visitante = formData.cargo_visitante || "";
-        this.visitante = formData.visitante || "";
-        this.hora_inicio = formData.hora_inicio || "";
-        this.consulta_proceso = formData.consulta_proceso || "";
-        this.sede_id = formData.sede_id || "";
-        this.consulta_sede = formData.consulta_sede || "";
-        this.consulta_interaccion = formData.consulta_interaccion || "";
-        this.solicitante_id = formData.solicitante_id || "";
-        this.consulta_solicitante = formData.consulta_solicitante || "";
-        this.telefono_contacto = formData.telefono_contacto || "";
-        this.correo_contacto = formData.correo_contacto || "";
-        this.estado_cierre_id = formData.estado_cierre_id || "";
-        this.consulta_estado_cierre = formData.consulta_estado_cierre || "";
-        this.observacion = formData.observacion || "";
-        this.proceso_id = formData.proceso_id || "";
-        this.interaccion_id = formData.interaccion_id || "";
-        this.nombre_contacto = formData.nombre_contacto || "";
-        this.nit_documento = formData.nit_documento || "";
-        this.consulta_pqrsf = formData.consulta_pqrsf || "";
-        this.pqrsf_id = formData.pqrsf_id || "";
-        this.cierra_pqrsf_id = formData.cierra_pqrsf_id || "";
-        this.consulta_cierra_pqrsf = formData.consulta_cierra_pqrsf || "";
-        this.responsable_id = formData.responsable_id || "";
-        this.consulta_responsable = formData.consulta_responsable || "";
-        this.latitud = formData.latitud || "";
-        this.longitud = formData.longitud || "";
+      const rutaActual = this.$route.path;
+      let deleteParam = false;
+      if (this.$route.params.id) {
+        delete this.$route.params.id;
+        deleteParam = true;
+      }
+      const nuevosParametros = { ...rutaActual.params };
+      if (deleteParam) {
+        this.$router
+          .replace({ ...rutaActual, params: nuevosParametros })
+          .then(() => {
+            const savedForms =
+              JSON.parse(localStorage.getItem("savedForms")) || [];
+            const formData = savedForms.find(
+              (form) => form.nit_documento === nit_documento
+            );
+            if (formData) {
+              this.correo_responsable2 = formData.correo_responsable2 || "";
+              this.correo_responsable1 = formData.correo_responsable1 || "";
+              this.correo_responsablePqrsf =
+                formData.correo_responsablePqrsf || "";
+              this.visitante_id = formData.visitante_id || "";
+              this.compromisos = formData.compromisos;
+              this.empresa_cliente_nombre =
+                formData.empresa_cliente_nombre || "";
+              this.temasPrincipales = formData.temasPrincipales;
+              this.consulta_empresa_cliente =
+                formData.consulta_empresa_cliente || "";
+              this.alcance_visita = formData.alcance_visita || "";
+              this.objetivo_visita = formData.objetivo_visita || "";
+              this.cargo_visitado = formData.cargo_visitado || "";
+              this.visitado = formData.visitado || "";
+              this.cargo_visitante = formData.cargo_visitante || "";
+              this.visitante = formData.visitante || "";
+              this.hora_inicio = formData.hora_inicio || "";
+              this.consulta_proceso = formData.consulta_proceso || "";
+              this.sede_id = formData.sede_id || "";
+              this.consulta_sede = formData.consulta_sede || "";
+              this.consulta_interaccion = formData.consulta_interaccion || "";
+              this.solicitante_id = formData.solicitante_id || "";
+              this.consulta_solicitante = formData.consulta_solicitante || "";
+              this.telefono_contacto = formData.telefono_contacto || "";
+              this.correo_contacto = formData.correo_contacto || "";
+              this.estado_cierre_id = formData.estado_cierre_id || "";
+              this.consulta_estado_cierre =
+                formData.consulta_estado_cierre || "";
+              this.observacion = formData.observacion || "";
+              this.proceso_id = formData.proceso_id || "";
+              this.interaccion_id = formData.interaccion_id || "";
+              this.nombre_contacto = formData.nombre_contacto || "";
+              this.nit_documento = formData.nit_documento || "";
+              this.consulta_pqrsf = formData.consulta_pqrsf || "";
+              this.pqrsf_id = formData.pqrsf_id || "";
+              this.id_registro = formData.id_registro || "";
+              this.cierra_pqrsf_id = formData.cierra_pqrsf_id || "";
+              this.consulta_cierra_pqrsf = formData.consulta_cierra_pqrsf || "";
+              this.responsable_id = formData.responsable_id || "";
+              this.consulta_responsable = formData.consulta_responsable || "";
+            }
+          });
+      } else {
+        const savedForms = JSON.parse(localStorage.getItem("savedForms")) || [];
+        const formData = savedForms.find(
+          (form) => form.nit_documento === nit_documento
+        );
+        if (formData) {
+          this.correo_responsable2 = formData.correo_responsable2 || "";
+          this.correo_responsable1 = formData.correo_responsable1 || "";
+          this.correo_responsablePqrsf = formData.correo_responsablePqrsf || "";
+          this.visitante_id = formData.visitante_id || "";
+          this.compromisos = formData.compromisos;
+          this.empresa_cliente_nombre = formData.empresa_cliente_nombre || "";
+          this.temasPrincipales = formData.temasPrincipales;
+          this.consulta_empresa_cliente =
+            formData.consulta_empresa_cliente || "";
+          this.alcance_visita = formData.alcance_visita || "";
+          this.objetivo_visita = formData.objetivo_visita || "";
+          this.cargo_visitado = formData.cargo_visitado || "";
+          this.visitado = formData.visitado || "";
+          this.cargo_visitante = formData.cargo_visitante || "";
+          this.visitante = formData.visitante || "";
+          this.hora_inicio = formData.hora_inicio || "";
+          this.consulta_proceso = formData.consulta_proceso || "";
+          this.sede_id = formData.sede_id || "";
+          this.consulta_sede = formData.consulta_sede || "";
+          this.consulta_interaccion = formData.consulta_interaccion || "";
+          this.solicitante_id = formData.solicitante_id || "";
+          this.consulta_solicitante = formData.consulta_solicitante || "";
+          this.telefono_contacto = formData.telefono_contacto || "";
+          this.correo_contacto = formData.correo_contacto || "";
+          this.estado_cierre_id = formData.estado_cierre_id || "";
+          this.consulta_estado_cierre = formData.consulta_estado_cierre || "";
+          this.observacion = formData.observacion || "";
+          this.proceso_id = formData.proceso_id || "";
+          this.interaccion_id = formData.interaccion_id || "";
+          this.nombre_contacto = formData.nombre_contacto || "";
+          this.nit_documento = formData.nit_documento || "";
+          this.consulta_pqrsf = formData.consulta_pqrsf || "";
+          this.pqrsf_id = formData.pqrsf_id || "";
+          this.id_registro = formData.id_registro || "";
+          this.cierra_pqrsf_id = formData.cierra_pqrsf_id || "";
+          this.consulta_cierra_pqrsf = formData.consulta_cierra_pqrsf || "";
+          this.responsable_id = formData.responsable_id || "";
+          this.consulta_responsable = formData.consulta_responsable || "";
+        }
       }
     },
     remainingCharsCompromiso(index) {

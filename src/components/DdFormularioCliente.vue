@@ -8052,7 +8052,7 @@ ul li {
   color: red;
 }
 
-#acuerdos_comerciales,
+#acuerdo_comercial,
 #razon_social {
   width: 100%;
   height: 37px;

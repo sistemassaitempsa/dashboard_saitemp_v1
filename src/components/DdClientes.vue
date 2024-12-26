@@ -23,6 +23,7 @@ import Loading from "./Loading.vue";
 import { Token } from "../Mixins/Token.js";
 import { Alerts } from "../Mixins/Alerts.js";
 import NotificacionesSocket from "./NotificacionSocket.vue";
+
 export default {
   components: {
     Loading,
@@ -103,6 +104,7 @@ export default {
   watch: {},
   mounted() {},
   created() {
+    this.urlExterna()
     this.getEstadosFirma();
     this.getItems();
     this.llenarLista();

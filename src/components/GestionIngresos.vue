@@ -2556,7 +2556,6 @@ h2 {
   /* Animación para expandir */
   width: 300px;
   height: 300px;
-
   /* Anchura del contenido expandido */
 }
 
