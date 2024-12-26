@@ -13,7 +13,7 @@
       :estados_firma="estados_firma"
       @actualizaResponsableDD="actualizaResponsableDD"
       @actualizaEstadoPadre="actualizaEstado"
-    />
+    ></Tabla>
   </div>
 </template>
 <script>
@@ -103,6 +103,7 @@ export default {
   watch: {},
   mounted() {},
   created() {
+    this.urlExterna();
     this.getEstadosFirma();
     this.getItems();
     this.llenarLista();

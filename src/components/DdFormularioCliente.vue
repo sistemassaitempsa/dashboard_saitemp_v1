@@ -670,6 +670,23 @@
               placeholder="Seleccione una opción"
             />
           </div>
+          <div class="col mb-3">
+            <label class="form-label"
+              >Observaciones a acuerdos comerciales:
+            </label>
+            <textarea
+              name=""
+              id="acuerdos_comerciales"
+              class="form-control"
+              rows="1"
+              v-model="acuerdos_comerciales"
+              @input="
+                acuerdos_comerciales = formatInputUpperCase($event.target.value)
+              "
+            ></textarea>
+          </div>
+        </div>
+        <div class="row" v-if="tipo_cliente == 1">
           <div class="col">
             <SearchList
               nombreCampo="Jornada Laboral: *"
@@ -8052,7 +8069,7 @@ ul li {
   color: red;
 }
 
-#acuerdos_comerciales,
+#acuerdo_comercial,
 #razon_social {
   width: 100%;
   height: 37px;
