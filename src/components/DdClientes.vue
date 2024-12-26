@@ -13,7 +13,7 @@
       :estados_firma="estados_firma"
       @actualizaResponsableDD="actualizaResponsableDD"
       @actualizaEstadoPadre="actualizaEstado"
-    ></Tabla>
+    />
   </div>
 </template>
 <script>

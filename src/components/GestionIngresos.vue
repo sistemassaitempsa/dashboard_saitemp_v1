@@ -316,6 +316,7 @@
           <div class="col">
             <label class="form-label">Fecha de ingreso: </label>
             <input
+              max="9999-12-31"
               type="date"
               class="form-control"
               autocomplete="off"
@@ -660,6 +661,7 @@
           <div class="col mb-3">
             <label class="form-label">Fecha examen: </label>
             <input
+              max="9999-12-31"
               type="date"
               class="form-control"
               autocomplete="off"
@@ -704,6 +706,7 @@
           <div class="col mb-3">
             <label class="form-label">Observaciones al servicio: </label>
             <textarea
+              maxlength="2000"
               name=""
               id="novedades"
               class="form-control"
