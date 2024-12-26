@@ -3565,7 +3565,7 @@
               placeholder="Seleccione una opción"
               :consulta="consulta_observacion_estado"
               :valida_campo="true"
-              :disabled="bloquea_campos && !permisos[26].autorizado"
+              :disabled="bloquea_campos && !permisos[2].autorizado"
               required
             />
           </div>
@@ -3584,7 +3584,7 @@
               @input="
                 afectacion_servicio = formatInputUpperCase($event.target.value)
               "
-              :disabled="bloquea_campos && !permisos[26].autorizado"
+              :disabled="bloquea_campos && !permisos[2].autorizado"
             ></textarea>
             <div class="d-flex justify-content-end">
               <small class="char-count"
@@ -3607,7 +3607,7 @@
               :registros="lista_encargados_corregir"
               placeholder="Seleccione una opción"
               :valida_campo="false"
-              :disabled="bloquea_campos && !permisos[26].autorizado"
+              :disabled="bloquea_campos && !permisos[2].autorizado"
             />
           </div>
         </div>
