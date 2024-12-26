@@ -3751,15 +3751,9 @@
               <li v-if="permisos[0].autorizado && ruta_id != undefined">
                 <hr class="dropdown-divider" />
               </li>
-              <li
-                v-if="
-                  permisos[0].autorizado &&
-                  ruta_id != undefined &&
-                  estado_firma_id_copia == 4
-                "
-              >
+              <li v-if="permisos[0].autorizado && ruta_id != undefined">
                 <button
-                  v-if="!contrato[0]"
+                  v-if="estado_firma_id_copia == 4 && !contrato[0]"
                   type="button"
                   class="btn btn-success btn-sm"
                   @click="openModalFirmas"
