@@ -4520,6 +4520,7 @@ export default {
     },
     agregarCamposCliente() {
       var self = this;
+      self.registroCliente.correoResponsable = this.correoResponsable;
       self.registroCliente.consulta_departamento_rut =
         this.consulta_departamento_rut;
       self.registroCliente.consulta_municipio_rut = this.consulta_municipio_rut;
@@ -7174,6 +7175,7 @@ export default {
       if (item.codigo_ciiu_id != "") {
         this.getActividadesCiiu(item.codigo_ciiu_id);
       }
+      this.correoResponsable = item.correoResponsable;
       this.consulta_departamento_rut = item.consulta_departamento_rut;
       this.consulta_municipio_rut = item.consulta_municipio_rut;
       this.novedad_servicio = item.novedad_servicio;

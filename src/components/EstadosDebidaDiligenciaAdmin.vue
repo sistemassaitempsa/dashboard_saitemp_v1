@@ -381,6 +381,11 @@ export default {
         responsables: this.asignar_usuarios,
         tiempo_respuesta: this.tiempo_respuesta,
       };
+      if (this.asignar_usuarios.length == 0) {
+        this.showAlert("Debe asignar por lo menos un responsable", "error");
+        this.loading = false;
+        return;
+      }
       if (this.id_estado == "") {
         let config = this.configHeader();
         axios
