@@ -3626,7 +3626,7 @@
       </div>
       <div class="row">
         <!-- <div class="col" style="margin-top:30px">
-                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                    <div dsa class="btn-group" role="group" aria-label="Basic mixed styles example">
                         <button v-if="permisos[1].autorizado" class="btn btn-success" type="button"
                             @click="hideBottons()">Generar pdf</button>
                         <button type="button" v-if="permisos[0].autorizado && ruta_id != undefined"
