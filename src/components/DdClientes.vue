@@ -2,6 +2,7 @@
   <div class="container">
     <NotificacionesSocket />
     <h2>Debida diligencia clientes</h2>
+    <ReteEditor />
     <Tabla
       :datos="datos"
       :tabla="tabla"
@@ -20,10 +21,12 @@ import Tabla from "./Tabla.vue";
 import { Token } from "../Mixins/Token.js";
 import { Alerts } from "../Mixins/Alerts.js";
 import NotificacionesSocket from "./NotificacionSocket.vue";
+import ReteEditor from "./components/ReteEditor.vue";
 export default {
   components: {
     Tabla,
     NotificacionesSocket,
+    ReteEditor,
   },
   mixins: [Token, Alerts],
   props: {
@@ -92,6 +95,7 @@ export default {
   watch: {},
   mounted() {},
   created() {
+    this.urlExterna()
     this.getEstadosFirma();
     this.getItems();
     this.llenarLista();
