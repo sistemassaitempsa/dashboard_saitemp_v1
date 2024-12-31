@@ -13,6 +13,7 @@
       @actualizaEstado="actualizaEstado"
       @actualizaResponsable="actualizaResponsable"
       @filtrando="filtrando"
+      @filtrarFechaIngreso="filtroFechaIngreso"
     />
   </div>
 </template>
@@ -180,6 +181,32 @@ export default {
     clearInterval(this.interval);
   },
   methods: {
+    filtroFechaIngreso(ordenar_prioridad, url = null) {
+      let self = this;
+      let config = this.configHeader();
+      if (ordenar_prioridad) {
+        if (url != null && url != "") {
+          axios.get(url, config).then(function (result) {
+            self.first_page_url = result.data.first_page_url.replace('"');
+            self.datos = result;
+          });
+        } else {
+          axios
+            .get(
+              self.URL_API +
+                "api/v1/formularioIngreso/filtrofechaingreso/" +
+                50,
+              config
+            )
+            .then(function (result) {
+              self.first_page_url = result.data.first_page_url.replace('"');
+              self.datos = result;
+            });
+        }
+      } else {
+        this.getItems();
+      }
+    },
     filtrando(boolean, url) {
       this.pagina_filtro = url;
       this.filtro_gestion_ingresos = boolean;

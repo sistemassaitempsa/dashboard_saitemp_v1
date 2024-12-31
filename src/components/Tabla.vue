@@ -526,11 +526,7 @@
         </button>
       </div>
     </div>
-    <div
-      v-if="!sin_registros && items_tabla2.length > 0"
-      class="row"
-      style="clear: both"
-    >
+    <div class="row" style="clear: both">
       <div
         v-if="ruta != '/navbar/procesosespeciales'"
         class="col-xs-3 col-md-3"
@@ -658,6 +654,30 @@
             {{ item.nombre }}
           </option>
         </select>
+      </div>
+      <div class="col-2" style="margin-top: 35px">
+        <label for="filtroFechaIngreso" class="form-check-label"
+          >Ordenar por prioridad:</label
+        >
+      </div>
+      <div class="col-1" style="margin-top: 35px">
+        <div class="form-check form-switch">
+          <input
+            @change="filtrarFechaIngreso"
+            class="form-check-input"
+            type="checkbox"
+            id="flexSwitchCheckDefault"
+          />
+        </div>
+
+        <!--   <button
+          type="button"
+          @click="filtrarFechaIngreso()"
+          class="btn btn-success btn-sm"
+          style="margin-top: 35px"
+        >
+          Ordenar por prioridad
+        </button> -->
       </div>
       <div v-if="cantidad >= 20" class="col-xs-3 col-md-3">
         <button
@@ -1296,6 +1316,7 @@ export default {
   },
   data() {
     return {
+      ordenar_prioridad: false,
       nombre_estado: "",
       toogleModal: false,
       lista_encargados_debida_diligencia: [],
@@ -1348,7 +1369,9 @@ export default {
         "a_color_resultado",
         "o_color_resultado",
         "estado_firma_id",
-      ], // este array contiene los nombres de las columnas queno queremos que se muestren en la tabla
+        "hora_confirmacion",
+        "responsable_id",
+      ], // este array contiene los nombres de las columnas que no queremos que se muestren en la tabla
       maxCaracteres: 20,
       lista_estados_id: {},
       lista_encargados: [],
@@ -2189,6 +2212,10 @@ export default {
           self.llenarTabla(result);
           self.loading = false;
         });
+    },
+    filtrarFechaIngreso() {
+      this.ordenar_prioridad = !this.ordenar_prioridad;
+      this.$emit("filtrarFechaIngreso", this.ordenar_prioridad);
     },
     confirmationMessage() {
       // 'Está seguro de guardar la información del formulario?', 'Si', 'Cancelar', 'Información guardada con exito'
