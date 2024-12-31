@@ -172,8 +172,7 @@ export default {
           value: "nombre_estado",
           label: "Estado",
           opciones: ["Igual a"],
-          type: "select",
-          opciones_select: [],
+          type: "text",
         },
         {
           value: "created_at",
