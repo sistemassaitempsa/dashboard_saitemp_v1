@@ -662,7 +662,7 @@
       >
         <div class="form-check form-switch">
           <label for="flexSwitchCheckDefault" class="form-check-label"
-            >Ordenar por prioridad</label
+            >Ordenar por prioridad fecha ingreso</label
           >
           <input
             :checked="filtro.ordenar_prioridad"
