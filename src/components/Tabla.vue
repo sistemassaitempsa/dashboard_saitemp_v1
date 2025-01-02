@@ -1448,6 +1448,8 @@ export default {
       this.label_busqueda_rapida = "Búsqueda por radicado";
       this.endpoint_busqueda_rapida = "buscarradicado";
     }
+    this.filtro.filtro = localStorage.getItem("ordenar_prioridad");
+    this.filtro.filtro_mios = localStorage.getItem("filtro_mios");
   },
   created() {
     this.empleados();
@@ -1455,6 +1457,8 @@ export default {
       this.spinner = false;
       this.sinregistros = "Realiza una búsqueda para ver los registros";
     }
+    this.filtro.ordenar_prioridad = localStorage.getItem("ordenar_prioridad");
+    this.filtro.filtro_mios = localStorage.getItem("filtro_mios");
   },
   methods: {
     asignacionMasiva() {
@@ -2240,10 +2244,12 @@ export default {
 
     filtrarFechaIngreso() {
       this.filtro.ordenar_prioridad = !this.filtro.ordenar_prioridad;
+      localStorage.setItem("ordenar_prioridad", this.filtro.ordenar_prioridad);
       this.$emit("filtrarFechaIngreso", this.filtro);
     },
     filtrarMios() {
       this.filtro.filtro_mios = !this.filtro.filtro_mios;
+      localStorage.setItem("filtro_mios", this.filtro.filtro_mios);
       this.$emit("filtrarFechaIngreso", this.filtro);
     },
     confirmationMessage() {

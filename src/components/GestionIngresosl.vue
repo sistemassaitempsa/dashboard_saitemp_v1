@@ -168,7 +168,18 @@ export default {
   watch: {},
   mounted() {},
   created() {
-    this.getItems();
+    if (
+      localStorage.getItem("ordenar_prioridad") ||
+      localStorage.getItem("filtro_mios")
+    ) {
+      const filtro = {
+        ordenar_prioridad: localStorage.getItem("ordenar_prioridad"),
+        filtro_mios: localStorage.getItem("filtro_mios"),
+      };
+      this.filtroFechaIngreso(filtro);
+    } else {
+      this.getItems();
+    }
     this.getEstadosIngreso();
 
     var self = this;
