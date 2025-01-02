@@ -37,6 +37,7 @@ export default {
   },
   data() {
     return {
+      filtro_rapido: false,
       show_table: false,
       datos: [],
       endpoint: "formularioingreso",
@@ -181,30 +182,26 @@ export default {
     clearInterval(this.interval);
   },
   methods: {
-    filtroFechaIngreso(ordenar_prioridad, url = null) {
+    filtroFechaIngreso(filtro, url = null) {
       let self = this;
       let config = this.configHeader();
-      if (ordenar_prioridad) {
-        if (url != null && url != "") {
-          axios.get(url, config).then(function (result) {
+      this.filtro_rapido = true;
+      if (url != null && url != "") {
+        axios.post(url, filtro, config).then(function (result) {
+          self.first_page_url = result.data.first_page_url.replace('"');
+          self.datos = result;
+        });
+      } else {
+        axios
+          .post(
+            self.URL_API + "api/v1/formularioIngreso/filtrofechaingreso/" + 300,
+            filtro,
+            config
+          )
+          .then(function (result) {
             self.first_page_url = result.data.first_page_url.replace('"');
             self.datos = result;
           });
-        } else {
-          axios
-            .get(
-              self.URL_API +
-                "api/v1/formularioIngreso/filtrofechaingreso/" +
-                50,
-              config
-            )
-            .then(function (result) {
-              self.first_page_url = result.data.first_page_url.replace('"');
-              self.datos = result;
-            });
-        }
-      } else {
-        this.getItems();
       }
     },
     filtrando(boolean, url) {
@@ -284,6 +281,12 @@ export default {
       }
       let self = this;
       let config = this.configHeader();
+      if (this.filtro_rapido) {
+        axios.post(currentUrl, config).then(function (result) {
+          self.datos = result;
+        });
+        return;
+      }
       axios.get(currentUrl, config).then(function (result) {
         self.datos = result;
       });

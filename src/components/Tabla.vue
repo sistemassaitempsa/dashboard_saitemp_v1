@@ -655,29 +655,39 @@
           </option>
         </select>
       </div>
-      <div class="col-2" style="margin-top: 35px">
-        <label for="filtroFechaIngreso" class="form-check-label"
-          >Ordenar por prioridad:</label
-        >
-      </div>
-      <div class="col-1" style="margin-top: 35px">
+      <div
+        v-if="ruta == '/navbar/gestion-ingresosl'"
+        class="col-2"
+        style="margin-top: 35px"
+      >
         <div class="form-check form-switch">
+          <label for="flexSwitchCheckDefault" class="form-check-label"
+            >Ordenar por prioridad</label
+          >
           <input
+            :checked="filtro.ordenar_prioridad"
             @change="filtrarFechaIngreso"
             class="form-check-input"
             type="checkbox"
             id="flexSwitchCheckDefault"
           />
         </div>
-
-        <!--   <button
-          type="button"
-          @click="filtrarFechaIngreso()"
-          class="btn btn-success btn-sm"
-          style="margin-top: 35px"
-        >
-          Ordenar por prioridad
-        </button> -->
+      </div>
+      <div
+        v-if="ruta == '/navbar/gestion-ingresosl'"
+        class="col-1"
+        style="margin-top: 35px"
+      >
+        <div class="form-check form-switch">
+          <label for="filtromios" class="form-check-label">Filtrar mios</label>
+          <input
+            :checked="filtro.filtro_mios"
+            @change="filtrarMios"
+            class="form-check-input"
+            type="checkbox"
+            id="filtromios"
+          />
+        </div>
       </div>
       <div v-if="cantidad >= 20" class="col-xs-3 col-md-3">
         <button
@@ -1316,7 +1326,10 @@ export default {
   },
   data() {
     return {
-      ordenar_prioridad: false,
+      filtro: {
+        ordenar_prioridad: false,
+        filtro_mios: false,
+      },
       nombre_estado: "",
       toogleModal: false,
       lista_encargados_debida_diligencia: [],
@@ -1877,6 +1890,7 @@ export default {
         return 0;
       });
     },
+
     update(item) {
       this.check = [];
       item.currentUrl = this.currentUrl;
@@ -2110,6 +2124,16 @@ export default {
       if (pag != null) {
         let self = this;
         let config = this.configHeader();
+        if (pag.includes("filtrofechaingreso")) {
+          axios.post(pag, this.filtro, config).then(function (result) {
+            self.links = result.data;
+            // self.llenarTabla(result)
+            self.items_tabla2 = Object.values(result.data.data); // se está llenando la tabla con los datos cuando se pagina
+            // desde acá porque en la función llenartabla() está dando error al llenar la tabla
+            self.loading = false;
+          });
+          return;
+        }
         axios.get(pag, config).then(function (result) {
           self.links = result.data;
           // self.llenarTabla(result)
@@ -2213,9 +2237,14 @@ export default {
           self.loading = false;
         });
     },
+
     filtrarFechaIngreso() {
-      this.ordenar_prioridad = !this.ordenar_prioridad;
-      this.$emit("filtrarFechaIngreso", this.ordenar_prioridad);
+      this.filtro.ordenar_prioridad = !this.filtro.ordenar_prioridad;
+      this.$emit("filtrarFechaIngreso", this.filtro);
+    },
+    filtrarMios() {
+      this.filtro.filtro_mios = !this.filtro.filtro_mios;
+      this.$emit("filtrarFechaIngreso", this.filtro);
     },
     confirmationMessage() {
       // 'Está seguro de guardar la información del formulario?', 'Si', 'Cancelar', 'Información guardada con exito'
