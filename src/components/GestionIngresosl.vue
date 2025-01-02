@@ -37,6 +37,7 @@ export default {
   },
   data() {
     return {
+      filtro: {},
       filtro_rapido: false,
       show_table: false,
       datos: [],
@@ -172,11 +173,13 @@ export default {
       localStorage.getItem("ordenar_prioridad") ||
       localStorage.getItem("filtro_mios")
     ) {
-      const filtro = {
-        ordenar_prioridad: localStorage.getItem("ordenar_prioridad"),
-        filtro_mios: localStorage.getItem("filtro_mios"),
+      this.filtro = {
+        ordenar_prioridad: JSON.parse(
+          localStorage.getItem("ordenar_prioridad")
+        ),
+        filtro_mios: JSON.parse(localStorage.getItem("filtro_mios")),
       };
-      this.filtroFechaIngreso(filtro);
+      this.filtroFechaIngreso(this.filtro);
     } else {
       this.getItems();
     }
@@ -194,6 +197,7 @@ export default {
   },
   methods: {
     filtroFechaIngreso(filtro, url = null) {
+      this.filtro = filtro;
       let self = this;
       let config = this.configHeader();
       this.filtro_rapido = true;
@@ -293,7 +297,7 @@ export default {
       let self = this;
       let config = this.configHeader();
       if (this.filtro_rapido) {
-        axios.post(currentUrl, config).then(function (result) {
+        axios.post(currentUrl, this.filtro, config).then(function (result) {
           self.datos = result;
         });
         return;

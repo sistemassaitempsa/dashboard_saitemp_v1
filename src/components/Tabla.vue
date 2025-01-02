@@ -1448,8 +1448,10 @@ export default {
       this.label_busqueda_rapida = "Búsqueda por radicado";
       this.endpoint_busqueda_rapida = "buscarradicado";
     }
-    this.filtro.filtro = localStorage.getItem("ordenar_prioridad");
-    this.filtro.filtro_mios = localStorage.getItem("filtro_mios");
+    this.filtro.ordenar_prioridad = JSON.parse(
+      localStorage.getItem("ordenar_prioridad")
+    );
+    this.filtro.filtro_mios = JSON.parse(localStorage.getItem("filtro_mios"));
   },
   created() {
     this.empleados();
@@ -1457,8 +1459,10 @@ export default {
       this.spinner = false;
       this.sinregistros = "Realiza una búsqueda para ver los registros";
     }
-    this.filtro.ordenar_prioridad = localStorage.getItem("ordenar_prioridad");
-    this.filtro.filtro_mios = localStorage.getItem("filtro_mios");
+    this.filtro.ordenar_prioridad = JSON.parse(
+      localStorage.getItem("ordenar_prioridad")
+    );
+    this.filtro.filtro_mios = JSON.parse(localStorage.getItem("filtro_mios"));
   },
   methods: {
     asignacionMasiva() {
