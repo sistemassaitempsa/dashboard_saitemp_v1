@@ -199,6 +199,9 @@
                 Guardar Estado
               </button>
             </div>
+            <div class="row">
+              <ListaEstados :lista="estados"></ListaEstados>
+            </div>
           </div>
         </div>
       </form>
@@ -212,14 +215,19 @@ import Loading from "./Loading.vue";
 import axios from "axios";
 import { Token } from "../Mixins/Token.js";
 import { Alerts } from "../Mixins/Alerts.js";
+import ListaEstados from "./ListaEstados.vue";
+
 export default {
   components: {
     Loading,
     SearchList,
+    ListaEstados,
   },
   mixins: [Token, Alerts],
   data() {
     return {
+      estados1: [],
+      estados2: [],
       mensaje_error: "",
       URL_API: process.env.VUE_APP_URL_API,
       usuario: "",
@@ -240,6 +248,12 @@ export default {
     $route() {
       this.limpiarFormulario();
     },
+  },
+  async mounted() {
+    this.getEstados();
+  },
+  created() {
+    this.getEstados();
   },
   methods: {
     changeTipoTiempo(option) {
